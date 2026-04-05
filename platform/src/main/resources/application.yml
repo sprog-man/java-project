@@ -1,16 +1,8 @@
 spring:
   application:
     name: pet-companion-platform
-  datasource:
-    url: jdbc:mysql://localhost:3306/pet_companion_platform?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  redis:
-    host: localhost
-    port: 6379
-    password:
-    database: 0
+  profiles:
+    active: dev
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -37,8 +29,3 @@ jwt:
   secret: pet_companion_platform_secret_key
   expire: 86400
   header: Authorization
-
-logging:
-  level:
-    com.petcompany.platform: debug
-    com.petcompany.platform.modules.*.mapper: debug

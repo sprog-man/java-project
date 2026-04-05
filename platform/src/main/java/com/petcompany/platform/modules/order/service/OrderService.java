@@ -1,5 +1,6 @@
 package com.petcompany.platform.modules.order.service;
 
+import com.petcompany.platform.common.result.PageResult;
 import com.petcompany.platform.modules.order.dto.OrderResponse;
 import com.petcompany.platform.modules.order.entity.Order;
 
@@ -37,18 +38,33 @@ public interface OrderService {
     void completeService(Long providerId, Long orderId);
 
     /**
-     * 根据ID获取订单
+     * 获取订单详情
      */
     Order getOrderById(Long orderId);
 
     /**
-     * 获取用户的订单列表
+     * 获取用户订单列表
      */
     List<OrderResponse> getUserOrderList(Long userId);
 
     /**
-     * 获取服务提供者的订单列表
+     * 分页获取用户订单列表
+     */
+    PageResult<OrderResponse> getUserOrderListPage(Long userId, Integer page, Integer size);
+
+    /**
+     * 获取服务提供者订单列表
      */
     List<OrderResponse> getProviderOrderList(Long providerId);
+
+    /**
+     * 分页获取服务提供者订单列表
+     */
+    PageResult<OrderResponse> getProviderOrderListPage(Long providerId, Integer page, Integer size);
+
+    /**
+     * 获取待接单的订单列表
+     */
+    List<OrderResponse> getPendingOrderList();
 
 }
