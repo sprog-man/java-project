@@ -6,6 +6,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  datasource:
+    url: jdbc:mysql://localhost:3306/pet_companion_platform?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis-plus:
   global-config:
@@ -24,8 +29,22 @@ server:
   port: 8080
   servlet:
     context-path: /api
+  tomcat:
+    # 最大线程数
+    max-threads: 200
+    # 最小线程数
+    min-spare-threads: 20
+    # 连接超时时间（毫秒）
+    connection-timeout: 60000
+    # 最大连接数
+    max-connections: 10000
 
 jwt:
   secret: pet_companion_platform_secret_key
   expire: 86400
   header: Authorization
+
+upload:
+  base-path: D:/uploads/pet-companion/
+  avatar-path: avatars/
+  relative-path: /uploads/

@@ -42,7 +42,7 @@ public class User {
     private String email;
 
     /**
-     * 昵称
+     * 别名
      */
     private String nickname;
 
@@ -67,6 +67,11 @@ public class User {
     private Integer verified;
 
     /**
+     * 角色：0-普通用户，1-管理员
+     */
+    private Integer role;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;
@@ -78,6 +83,7 @@ public class User {
 
     /**
      * 是否删除
+     * 这个注解告诉 MyBatis-Plus：deleted 字段用于逻辑删除，而不是物理删除。
      */
     @TableLogic
     private Integer deleted;

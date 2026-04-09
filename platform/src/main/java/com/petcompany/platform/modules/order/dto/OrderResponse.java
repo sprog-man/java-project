@@ -26,9 +26,9 @@ public class OrderResponse {
     private String petName;
 
     /**
-     * 服务类型名称
+     * 服务名称
      */
-    private String serviceTypeName;
+    private String serviceName;
 
     /**
      * 服务提供者名称
@@ -36,14 +36,9 @@ public class OrderResponse {
     private String providerName;
 
     /**
-     * 服务开始时间
+     * 服务时间
      */
-    private LocalDateTime serviceStartTime;
-
-    /**
-     * 服务结束时间
-     */
-    private LocalDateTime serviceEndTime;
+    private String serviceTime;
 
     /**
      * 服务地址
@@ -51,33 +46,48 @@ public class OrderResponse {
     private String address;
 
     /**
+     * 联系电话
+     */
+    private String phone;
+
+    /**
+     * 备注信息
+     */
+    private String notes;
+
+    /**
      * 订单价格
      */
-    private Double price;
+    private Integer price;
 
     /**
      * 订单状态
      */
-    private Integer status;
+    private String status;
 
     /**
-     * 订单状态名称
+     * 订单状态文本
      */
-    private String statusName;
+    private String statusText;
 
     /**
-     * 支付状态
+     * 支付状态文本
      */
-    private Integer payStatus;
+    private String paymentStatusText;
 
     /**
-     * 支付状态名称
+     * 支付时间
      */
-    private String payStatusName;
+    private LocalDateTime paymentTime;
 
     /**
      * 创建时间
      */
     private LocalDateTime createTime;
+
+    /**
+     * 是否已评价
+     */
+    private boolean reviewed;
 
 }

@@ -27,7 +27,7 @@ public class PetController {
     /**
      * 创建宠物
      */
-    @PostMapping
+    @PostMapping("/add")
     public Result<?> createPet(@Valid @RequestBody PetCreateRequest request, Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         petService.createPet(userId, request);
@@ -37,7 +37,7 @@ public class PetController {
     /**
      * 更新宠物
      */
-    @PutMapping
+    @PutMapping("/update")
     public Result<?> updatePet(@Valid @RequestBody PetUpdateRequest request, Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         petService.updatePet(userId, request);

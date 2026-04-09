@@ -12,7 +12,8 @@ public enum ResultCode {
     NOT_FOUND(404, "资源不存在"),
     PARAM_ERROR(400, "参数错误"),
     BUSINESS_ERROR(501, "业务错误"),
-    SYSTEM_ERROR(502, "系统错误");
+    SYSTEM_ERROR(502, "系统错误"),
+    USER_NOT_FOUND(503, "用户不存在");
 
     private final int code;
     private final String message;

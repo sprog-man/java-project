@@ -85,6 +85,7 @@ public class Result<T> implements Serializable {
     public static <T> Result<T> fail(ResultCode resultCode) {
         Result<T> result = new Result<>();
         result.setCode(resultCode.getCode());
+        /*resultCode.getMessage() 返回的正是你在 ResultCode 枚举类中预先定义好的、与特定状态码对应的描述信息。*/
         result.setMessage(resultCode.getMessage());
         return result;
     }

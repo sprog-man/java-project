@@ -75,25 +75,25 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
     @Override
     public void acceptOrder(Long providerId, Long orderId) {
         // 接受订单
-        orderService.acceptOrder(providerId, orderId);
+        orderService.acceptOrder(orderId);
     }
 
     @Override
     public void startService(Long providerId, Long orderId) {
         // 开始服务
-        orderService.startService(providerId, orderId);
+        orderService.startOrder(orderId);
     }
 
     @Override
     public void completeService(Long providerId, Long orderId) {
         // 完成服务
-        orderService.completeService(providerId, orderId);
+        orderService.completeOrder(orderId);
     }
 
     @Override
     public List<OrderResponse> getProviderOrderList(Long providerId) {
         // 获取服务提供者的订单列表
-        return orderService.getProviderOrderList(providerId);
+        return orderService.getProviderOrderList();
     }
 
 }

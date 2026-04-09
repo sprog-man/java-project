@@ -58,10 +58,20 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .cors(cors -> cors.configurationSource(request -> {
+                var config = new org.springframework.web.cors.CorsConfiguration();
+                config.setAllowedOrigins(java.util.List.of("http://localhost:3000"));
+                config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(java.util.List.of("*"));
+                config.setAllowCredentials(true);
+                return config;
+            }))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/user/register", "/user/login", "/health", "/test").permitAll()
-                .anyRequest().authenticated()
-            )
+            .requestMatchers("/user/register", "/user/login", "/user/admin/login", "/health", "/test").permitAll()
+            .requestMatchers("/admin/**").hasAuthority("ADMIN")
+            .requestMatchers("/user/**").permitAll()
+            .anyRequest().authenticated()
+        )
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

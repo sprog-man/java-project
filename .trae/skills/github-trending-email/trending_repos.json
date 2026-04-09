@@ -1,0 +1,42 @@
+[
+  {
+    "owner": "google-ai-edge",
+    "repo": "gallery",
+    "description": "A gallery that showcases on-device ML/GenAI use cases and allows people to try and use models locally.",
+    "stars": "Star",
+    "url": "https://github.com/google-ai-edge/gallery",
+    "readme": "Request:An error occurred while sending the request."
+  },
+  {
+    "owner": "Blaizzy",
+    "repo": "mlx-vlm",
+    "description": "MLX-VLM is a package for inference and fine-tuning of Vision Language Models (VLMs) on your Mac using MLX.",
+    "stars": "Star",
+    "url": "https://github.com/Blaizzy/mlx-vlm",
+    "readme": "Request:An error occurred while sending the request."
+  },
+  {
+    "owner": "siddharthvaddem",
+    "repo": "openscreen",
+    "description": "Create stunning demos for free. Open-source, no subscriptions, no watermarks, and free for commercial use. An alternative to Screen Studio.",
+    "stars": "Star",
+    "url": "https://github.com/siddharthvaddem/openscreen",
+    "readme": "Request:An error occurred while sending the request."
+  },
+  {
+    "owner": "block",
+    "repo": "goose",
+    "description": "an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM",
+    "stars": "Star",
+    "url": "https://github.com/block/goose",
+    "readme": "Request:An error occurred while sending the request."
+  },
+  {
+    "owner": "onyx-dot-app",
+    "repo": "onyx",
+    "description": "Open Source AI Platform - AI Chat with advanced features that works with every LLM",
+    "stars": "Star",
+    "url": "https://github.com/onyx-dot-app/onyx",
+    "readme": "<a name=\"readme-top\"></a>\n\n<h2 align=\"center\">\n    <a href=\"https://www.onyx.app/?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme\"> <img width=\"50%\" src=\"https://github.com/onyx-dot-app/onyx/blob/logo/OnyxLogoCropped.jpg?raw=true\" /></a>\n</h2>\n\n<p align=\"center\">\n    <a href=\"https://discord.gg/TDJ59cGV2X\" target=\"_blank\">\n        <img src=\"https://img.shields.io/badge/discord-join-blue.svg?logo=discord&logoColor=white\" alt=\"Discord\" />\n    </a>\n    <a href=\"https://docs.onyx.app/?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme\" target=\"_blank\">\n        <img src=\"https://img.shields.io/badge/docs-view-blue\" alt=\"Documentation\" />\n    </a>\n    <a href=\"https://www.onyx.app/?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme\" target=\"_blank\">\n        <img src=\"https://img.shields.io/website?url=https://www.onyx.app&up_message=visit&up_color=blue\" alt=\"Documentation\" />\n    </a>\n    <a href=\"https://github.com/onyx-dot-app/onyx/blob/main/LICENSE\" target=\"_blank\">\n        <img src=\"https://img.shields.io/static/v1?label=license&message=MIT&color=blue\" alt=\"License\" />\n    </a>\n</p>\n\n<p align=\"center\">\n  <a href=\"https://trendshift.io/repositories/12516\" target=\"_blank\">\n    <img src=\"https://trendshift.io/api/badge/repositories/12516\" alt=\"onyx-dot-app/onyx | Trendshift\" style=\"width: 250px; height: 55px;\" />\n  </a>\n</p>\n\n# Onyx - The Open Source AI Platform\n\n**[Onyx](https://www.onyx.app/?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme)** is the application layer for LLMs - bringing a feature-rich interface that can be easily hosted by anyone.\nOnyx enables LLMs through advanced capabilities like RAG, web search, code execution, file creation, deep research and more.\n\nConnect your applications with over 50+ indexing based connectors provided out of the box or via MCP.\n\n> [!TIP]\n> Deploy with a single command:\n> ```\n> curl -fsSL https://onyx.app/install_onyx.sh | bash\n> ```\n\n![Onyx Chat Silent Demo](https://github.com/onyx-dot-app/onyx/releases/download/v3.0.0/Onyx.gif)\n\n---\n\n## ⭐ Features\n\n- **🔍 Agentic RAG:** Get best in class search and answer quality based on hybrid index + AI Agents for information retrieval\n  - Benchmark to release soon!\n- **🔬 Deep Research:** Get in depth reports with a multi-step research flow.\n  - Top of [leaderboard](https://github.com/onyx-dot-app/onyx_deep_research_bench) as of Feb 2026.\n- **🤖 Custom Agents:** Build AI Agents with unique instructions, knowledge, and actions.\n- **🌍 Web Search:** Browse the web to get up to date information.\n  - Supports Serper, Google PSE, Brave, SearXNG, and others.\n  - Comes with an in house web crawler and support for Firecrawl/Exa.\n- **📄 Artifacts:** Generate documents, graphics, and other downloadable artifacts.\n- **▶️ Actions & MCP:** Let Onyx agents interact with external applications, comes with flexible Auth options.\n- **💻 Code Execution:** Execute code in a sandbox to analyze data, render graphs, or modify files.\n- **🎙️ Voice Mode:** Chat with Onyx via text-to-speech and speech-to-text.\n- **🎨 Image Generation:** Generate images based on user prompts.\n\nOnyx supports all major LLM providers, both self-hosted (like Ollama, LiteLLM, vLLM, etc.) and proprietary (like Anthropic, OpenAI, Gemini, etc.).\n\nTo learn more - check out our [docs](https://docs.onyx.app/welcome?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme)!\n\n---\n\n## 🚀 Deployment Modes\n\n> Onyx supports deployments in Docker, Kubernetes, Helm/Terraform and provides guides for major cloud providers.\n> Detailed deployment guides found [here](https://docs.onyx.app/deployment/overview).\n\nOnyx supports two separate deployment options: standard and lite.\n\n#### Onyx Lite\n\nThe Lite mode can be thought of as a lightweight Chat UI. It requires less resources (under 1GB memory) and runs a less complex stack.\nIt is great for users who want to test out Onyx quickly or for teams who are only interested in the Chat UI and Agents functionalities.\n\n#### Standard Onyx\n\nThe complete feature set of Onyx which is recommended for serious users and larger teams. Additional components not included in Lite mode:\n- Vector + Keyword index for RAG.\n- Background containers to run job queues and workers for syncing knowledge from connectors.\n- AI model inference servers to run deep learning models used during indexing and inference.\n- Performance optimizations for large scale use via in memory cache (Redis) and blob store (MinIO).\n\n> [!TIP]  \n> **To try Onyx for free without deploying, visit [Onyx Cloud](https://cloud.onyx.app/signup?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme)**.\n\n---\n\n## 🏢 Onyx for Enterprise\n\nOnyx is built for teams of all sizes, from individual users to the largest global enterprises:\n- 👥 Collaboration: Share chats and agents with other members of your organization.\n- 🔐 Single Sign On: SSO via Google OAuth, OIDC, or SAML. Group syncing and user provisioning via SCIM.\n- 🛡️ Role Based Access Control: RBAC for sensitive resources like access to agents, actions, etc.\n- 📊 Analytics: Usage graphs broken down by teams, LLMs, or agents.\n- 🕵️ Query History: Audit usage to ensure safe adoption of AI in your organization.\n- 💻 Custom code: Run custom code to remove PII, reject sensitive queries, or to run custom analysis.\n- 🎨 Whitelabeling: Customize the look and feel of Onyx with custom naming, icons, banners, and more.\n\n## 📚 Licensing\n\nThere are two editions of Onyx:\n\n- Onyx Community Edition (CE) is available freely under the MIT license and covers all of the core features for Chat, RAG, Agents, and Actions.\n- Onyx Enterprise Edition (EE) includes extra features that are primarily useful for larger organizations.\n\nFor feature details, check out [our website](https://www.onyx.app/pricing?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme).\n\n## 👪 Community\n\nJoin our open source community on **[Discord](https://discord.gg/TDJ59cGV2X)**!\n\n## 💡 Contributing\n\nLooking to contribute? Please check out the [Contribution Guide](CONTRIBUTING.md) for more details.\n"
+  }
+]

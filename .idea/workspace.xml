@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="975f1c1a-c94f-4bfa-9db4-672f3a13d892" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/user/EditUserInfo.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/PlatformApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/common/result/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/common/result/Result.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/common/result/ResultCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/common/result/ResultCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/config/WebMvcConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/config/WebMvcConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/UserDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/UserDetailsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/entity/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/entity/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/OrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/impl/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/impl/OrderServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/controller/PetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/controller/PetController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/impl/ServiceProviderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/impl/ServiceProviderServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/LoginResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/RegisterRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/RegisterRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/resources/application-dev.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/resources/application-prod.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/resources/application-test.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/resources/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/resources/schema.sql" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Vue Composition API Component" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;sprog-man&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:sprog-man/java-project&quot;,
+    &quot;accountId&quot;: &quot;10f6dd54-bc3a-4776-b1b0-f267ecc79094&quot;
+  }
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3Bw7M7wfojpYOlkwrVS7OfJ2NUE" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Downloaded.Files.Path.Enabled": "false",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.PetCompanionApplication.executor": "Run",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Java-project/Testdemo",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "D:\\IntelliJ IDEA 2025.3.4\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "vue.recent.templates": [
+      "Vue Composition API Component"
+    ]
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="PetCompanionApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="platform" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.petcompany.platform.PetCompanionApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="975f1c1a-c94f-4bfa-9db4-672f3a13d892" name="Changes" comment="" />
+      <created>1775388227370</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1775388227370</updated>
+      <workItem from="1775388228386" duration="538000" />
+      <workItem from="1775388813444" duration="179000" />
+      <workItem from="1775389000623" duration="1145000" />
+      <workItem from="1775472197642" duration="3340000" />
+      <workItem from="1775559935708" duration="811000" />
+      <workItem from="1775560755976" duration="4000" />
+      <workItem from="1775630678044" duration="25983000" />
+      <workItem from="1775693200771" duration="7474000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

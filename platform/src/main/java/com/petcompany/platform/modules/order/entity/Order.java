@@ -62,6 +62,16 @@ public class Order {
     private String address;
 
     /**
+     * 联系电话
+     */
+    private String phone;
+
+    /**
+     * 备注信息
+     */
+    private String notes;
+
+    /**
      * 订单价格
      */
     private Double price;

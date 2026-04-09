@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.petcompany.platform.common.exception.BusinessException;
 import com.petcompany.platform.infrastructure.security.JwtService;
+import com.petcompany.platform.modules.user.dto.AdminLoginRequest;
+import com.petcompany.platform.modules.user.dto.AdminLoginResponse;
 import com.petcompany.platform.modules.user.dto.LoginRequest;
 import com.petcompany.platform.modules.user.dto.LoginResponse;
 import com.petcompany.platform.modules.user.dto.RegisterRequest;
@@ -12,13 +14,21 @@ import com.petcompany.platform.modules.user.service.UserService;
 import com.petcompany.platform.modules.user.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 用户服务实现类
@@ -39,27 +49,51 @@ public class UserServiceImpl implements UserService {
     @Value("${jwt.expire}")
     private Long expire;
 
+    @Value("${upload.base-path}")
+    private String basePath;
+
+    @Value("${upload.avatar-path}")
+    private String avatarPath;
+
+    @Value("${upload.relative-path}")
+    private String relativePath;
+
     @Override
     public void register(RegisterRequest request) {
+        log.info("开始注册用户: phone={}, username={}, nickname={}", request.getPhone(), request.getUsername(), request.getNickname());
         // 检查手机号是否已存在
+        log.info("检查手机号是否已存在: {}", request.getPhone());
         User existingUser = getUserByPhone(request.getPhone());
         if (existingUser != null) {
+            log.warn("手机号已注册: {}", request.getPhone());
             throw new BusinessException("手机号已注册");
         }
 
         // 创建新用户
+        log.info("创建新用户");
         User user = new User();
         user.setPhone(request.getPhone());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setNickname(request.getNickname());
+        user.setUsername(request.getUsername());
+        // 如果昵称为空，使用用户名作为昵称
+        user.setNickname(request.getNickname() != null && !request.getNickname().isEmpty() ? request.getNickname() : request.getUsername());
         user.setUserType(0); // 默认宠物主
         user.setStatus(0); // 正常
         user.setVerified(0); // 未认证
+        user.setRole(0); // 默认普通用户
         user.setCreateTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
         user.setDeleted(0); // 未删除
 
-        userMapper.insert(user);
+        log.info("保存用户到数据库: phone={}, username={}", request.getPhone(), request.getUsername());
+        int result = userMapper.insert(user);
+        log.info("数据库插入结果: {}", result);
+        if (result > 0) {
+            log.info("用户注册成功: phone={}, username={}, userId={}", request.getPhone(), request.getUsername(), user.getId());
+        } else {
+            log.error("用户注册失败: phone={}, username={}", request.getPhone(), request.getUsername());
+            throw new BusinessException("注册失败");
+        }
     }
 
     @Override
@@ -84,6 +118,7 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("userType", user.getUserType());
+        claims.put("role", user.getRole());
         String token = jwtService.generateToken(claims);
 
         // 构建响应
@@ -94,12 +129,56 @@ public class UserServiceImpl implements UserService {
         LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
         userInfo.setId(user.getId());
         userInfo.setPhone(user.getPhone());
-        userInfo.setNickname(user.getNickname());
+        userInfo.setUsername(user.getUsername());
         userInfo.setAvatar(user.getAvatar());
         userInfo.setUserType(user.getUserType());
         userInfo.setVerified(user.getVerified());
 
         response.setUserInfo(userInfo);
+        /*return到哪里去？涉及到mvc机制，谁请求到UserController对应的路径调用该方法，就返回给谁*/
+        return response;
+    }
+
+    @Override
+    public AdminLoginResponse adminLogin(AdminLoginRequest request) {
+        // 根据用户名查找用户
+        User user = getUserByUsername(request.getUsername());
+        if (user == null) {
+            throw new BusinessException("管理员不存在");
+        }
+
+        // 检查是否是管理员
+        if (user.getRole() != 1) {
+            throw new BusinessException("不是管理员账号");
+        }
+
+        // 检查密码
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BusinessException("密码错误");
+        }
+
+        // 检查用户状态
+        if (user.getStatus() == 1) {
+            throw new BusinessException("账号已禁用");
+        }
+
+        // 生成JWT令牌
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("role", user.getRole());
+        String token = jwtService.generateToken(claims);
+
+        // 构建响应
+        AdminLoginResponse response = new AdminLoginResponse();
+        response.setAccessToken(token);
+
+        AdminLoginResponse.AdminInfo adminInfo = new AdminLoginResponse.AdminInfo();
+        adminInfo.setId(user.getId());
+        adminInfo.setUsername(user.getUsername());
+        adminInfo.setNickname(user.getNickname());
+        adminInfo.setAvatar(user.getAvatar());
+
+        response.setAdminInfo(adminInfo);
 
         return response;
     }
@@ -112,7 +191,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByPhone(String phone) {
         LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(User::getPhone, phone);
+        // 优先通过用户名查询，然后是手机号，最后是昵称
+        wrapper.eq(User::getUsername, phone).or().eq(User::getPhone, phone).or().eq(User::getNickname, phone);
+        return userMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(User::getUsername, username);
         return userMapper.selectOne(wrapper);
     }
 
@@ -140,4 +227,83 @@ public class UserServiceImpl implements UserService {
         userMapper.updateById(user);
     }
 
+    @Override
+    public String uploadAvatar(Long userId, MultipartFile file) {
+        // 验证用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 验证文件是否为空
+        if (file.isEmpty()) {
+            throw new BusinessException("文件不能为空");
+        }
+
+        // 生成UUID文件名
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : ".jpg";
+        String fileName = UUID.randomUUID().toString() + extension;
+
+        // 生成日期目录
+        LocalDate now = LocalDate.now();
+        String datePath = now.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+
+        // 构建完整的文件路径
+        String fullPath = basePath + avatarPath + datePath;
+        File directory = new File(fullPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        // 保存文件
+        File dest = new File(directory, fileName);
+        try {
+            file.transferTo(dest);
+        } catch (IOException e) {
+            log.error("保存头像文件失败", e);
+            throw new BusinessException("保存头像失败");
+        }
+
+        // 生成相对路径
+        String relativeAvatarPath = relativePath + avatarPath + datePath + "/" + fileName;
+
+        // 更新数据库
+        user.setAvatar(relativeAvatarPath);
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.updateById(user);
+
+        return relativeAvatarPath;
+    }
+
+    /*前端获取用户信息*/
+    @Override
+    public Map<String, Object> getCurrentUserInfo() {
+        // 从SecurityContext中获取用户ID
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+
+        Long userId = (Long) authentication.getPrincipal();
+        User user = getUserById(userId);
+
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 构建用户信息响应
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("id", user.getId());
+        userInfo.put("username", user.getUsername());
+        userInfo.put("phone", user.getPhone());
+        userInfo.put("email", user.getEmail());
+        userInfo.put("nickname", user.getNickname());
+        userInfo.put("avatar", user.getAvatar());
+        userInfo.put("userType", user.getUserType());
+        userInfo.put("verified", user.getVerified());
+        userInfo.put("role", user.getRole());
+
+        return userInfo;
+    }
 }

@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
  * 订单创建请求
  */
@@ -22,24 +20,52 @@ public class OrderCreateRequest {
      * 服务类型ID
      */
     @NotNull(message = "服务类型ID不能为空")
-    private Long serviceTypeId;
+    private Long serviceType;
+
+    /**
+     * 服务日期
+     */
+    @NotBlank(message = "服务日期不能为空")
+    private String serviceDate;
 
     /**
      * 服务开始时间
      */
-    @NotNull(message = "服务开始时间不能为空")
-    private LocalDateTime serviceStartTime;
+    @NotBlank(message = "服务开始时间不能为空")
+    private String serviceStartTime;
 
     /**
      * 服务结束时间
      */
-    @NotNull(message = "服务结束时间不能为空")
-    private LocalDateTime serviceEndTime;
+    @NotBlank(message = "服务结束时间不能为空")
+    private String serviceEndTime;
 
     /**
      * 服务地址
      */
     @NotBlank(message = "服务地址不能为空")
     private String address;
+
+    /**
+     * 联系电话
+     */
+    @NotBlank(message = "联系电话不能为空")
+    private String phone;
+
+    /**
+     * 备注信息
+     */
+    private String notes;
+
+    /**
+     * 服务时间（格式：YYYY-MM-DD HH:MM-HH:MM）
+     */
+    private String serviceTime;
+
+    /**
+     * 订单价格
+     */
+    @NotNull(message = "订单价格不能为空")
+    private Integer price;
 
 }

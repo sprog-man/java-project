@@ -40,9 +40,9 @@ public class LoginResponse {
         private String phone;
 
         /**
-         * 昵称
+         * 用户名
          */
-        private String nickname;
+        private String username;
 
         /**
          * 头像
