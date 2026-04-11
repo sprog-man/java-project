@@ -12,11 +12,11 @@
         <button class="search-btn">搜索</button>
       </div>
       <div class="filter-box">
+        <!-- ✅ 1. 动态渲染类型筛选 -->
         <select v-model="filters.type" @change="handleFilter">
-          <option value="">全部类型</option>
-          <option value="1">猫</option>
-          <option value="2">狗</option>
-          <option value="3">其他</option>
+          <option v-for="opt in adminStore.petTypeOptions" :key="opt.value" :value="opt.value">
+            {{ opt.label }}
+          </option>
         </select>
       </div>
     </div>
@@ -131,13 +131,11 @@
 
 <script setup>import { ref, onMounted } from 'vue'
 import { useAdminStore } from '../../store/admin' // ✅ 引入 store
+
 const adminStore = useAdminStore()
 const pets = ref([])
 const searchQuery = ref('')
-const filters = ref({
-  type: '',
-  gender: ''
-})
+const filters = ref({ type: '' }) // ✅ 2. 简化 filters，只保留 type
 
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -174,13 +172,14 @@ const viewPetDetail = (pet) => {
 
 const fetchPets = async () => {
   try {
-    // ✅ 调用 Store 中的真实接口
     const params = {
       page: currentPage.value,
       size: pageSize.value,
-      keyword: searchQuery.value
+      keyword: searchQuery.value,
+      type: filters.value.type || undefined // ✅ 3. 关键：把 type 传给后端
     }
 
+    console.log('正在请求宠物列表:', params) // 调试用
     const pageData = await adminStore.fetchPetList(params)
 
     pets.value = pageData.records || []

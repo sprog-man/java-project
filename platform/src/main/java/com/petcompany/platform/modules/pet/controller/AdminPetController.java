@@ -30,12 +30,12 @@ public class AdminPetController {
     public Result<Page<PetResponse>> getPetList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword){
-        log.info("管理员获取宠物列表：page={},size={},keyword={}",page,size,keyword);
-        Page<PetResponse> result = petService.getAdminPetPage(page,size,keyword);
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer type // ✅ 新增：接收类型筛选
+    ){
+        log.info("管理员获取宠物列表：page={},size={},keyword={},type={}",page,size,keyword,type);
+        Page<PetResponse> result = petService.getAdminPetPage(page,size,keyword,type);
         return Result.success("获取宠物列表成功",result);
-
-
     }
 
 }

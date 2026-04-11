@@ -10,7 +10,14 @@ export const useAdminStore = defineStore('admin', {
         totalUsers: 0, // 总用户数
         serviceList: [], // ✅ 新增：缓存服务类型列表
         petList: [], // ✅ 新增：缓存宠物列表
-        totalPets: 0 // ✅ 新增：总宠物数
+        totalPets: 0, // ✅ 新增：总宠物数
+        orderStatusOptions: [], // ✅ 新增：缓存订单状态选项
+        petTypeOptions:  [ // ✅ 新增：宠物类型字典（也可以从后端接口获取）
+            { value: '', label: '全部类型' },
+            { value: 1, label: '猫' },
+            { value: 2, label: '狗' },
+            { value: 3, label: '其他' }
+        ]
     }),
     actions: {
         // 获取后台仪表盘统计数据
@@ -166,14 +173,25 @@ export const useAdminStore = defineStore('admin', {
                 throw error;
             }
         },
-        // ✅ 新增：获取管理员端订单列表
+        // ✅ 新增：获取订单状态选项
+        async fetchOrderStatusOptions() {
+            try {
+                const response = await axios.get('/admin/orders/status-options')
+                if (response.data.code === 200) {
+                    this.orderStatusOptions = response.data.data
+                }
+            } catch (error) {
+                console.error('获取订单状态选项失败', error)
+            }
+        },
+
+        // ✅ 修改：管理员获取端订单列表
         async fetchOrderList(params = {}) {
             try {
                 console.log('Admin Store: 开始获取订单列表', params)
                 const response = await axios.get('/admin/orders', { params })
 
                 if (response.data && response.data.code === 200) {
-                    // 返回的是分页对象 Page
                     return response.data.data
                 } else {
                     throw new Error(response.data?.message || '获取订单列表失败')
@@ -183,21 +201,17 @@ export const useAdminStore = defineStore('admin', {
                 throw error
             }
         },
-        // ✅ 新增：获取管理员端宠物列表
+        // ✅ 新增：获取宠物列表（确保参数能传过去）
         async fetchPetList(params = {}) {
             try {
-                console.log('Admin Store: 开始获取宠物列表', params)
                 const response = await axios.get('/admin/pets', { params })
-
                 if (response.data && response.data.code === 200) {
                     const pageData = response.data.data
                     this.petList = pageData.records || []
                     this.totalPets = pageData.total || 0
-                    console.log('Admin Store: 宠物列表更新成功', this.petList)
                     return pageData
-                } else {
-                    throw new Error(response.data?.message || '获取宠物列表失败')
                 }
+                throw new Error(response.data?.message || '获取宠物列表失败')
             } catch (error) {
                 console.error('Admin Store: 获取宠物列表异常', error)
                 throw error

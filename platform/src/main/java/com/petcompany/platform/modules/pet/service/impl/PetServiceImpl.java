@@ -135,23 +135,29 @@ public class PetServiceImpl implements PetService {
     * 管理员端分页查询宠物
     * */
     @Override
-    public Page<PetResponse> getAdminPetPage(int page, int size, String keyword) {
+    public Page<PetResponse> getAdminPetPage(int page, int size, String keyword, Integer type) {
         // 1. 创建分页对象
         Page<Pet> petPage = new Page<>(page, size);
 
-        //2.构建查询条件
+        // 2. 构建查询条件
         LambdaQueryWrapper<Pet> wrapper = Wrappers.lambdaQuery();
-        if (StringUtils.isNotBlank( keyword)){
-            // 简单起见，先按宠物名称模糊搜索
-            // 如果要按主人名称搜索，通常需要连表查询或先查用户ID
-            wrapper.like(Pet::getName, keyword);
+
+        // ✅ 新增：按宠物类型筛选
+        if (type != null) {
+            wrapper.eq(Pet::getType, type);
         }
+
+        // ✅ 优化：关键词搜索（支持宠物名称或品种）
+        if (StringUtils.isNotBlank(keyword)) {
+            wrapper.and(w -> w.like(Pet::getName, keyword).or().like(Pet::getBreed, keyword));
+        }
+
         wrapper.eq(Pet::getDeleted, 0);
 
         // 3. 执行分页查询
         IPage<Pet> result = petMapper.selectPage(petPage, wrapper);
 
-        //4.转换为DTO并填充主人信息
+        // 4. 转换为 DTO 并填充主人信息
         Page<PetResponse> responsePage = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
         List<PetResponse> responseList = result.getRecords().stream().map(pet -> {
             PetResponse response = convertToResponse(pet);
@@ -159,7 +165,7 @@ public class PetServiceImpl implements PetService {
             if (pet.getUserId() != null) {
                 User user = userService.getUserById(pet.getUserId());
                 if (user != null) {
-                    response.setOwnerName(user.getUsername() != null ? user.getUsername() : user.getUsername());
+                    response.setOwnerName(user.getUsername());
                 }
             }
             return response;

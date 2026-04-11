@@ -78,7 +78,7 @@ public interface OrderService {
     /*
     * 管理员获取订单列表
     * */
-    public Page<OrderResponse> getAdminOrderPage(int page, int size, Integer status, String keyword);
+    Page<OrderResponse> getAdminOrderPage(int page, int size, String status, Long serviceTypeId, String keyword);
 
 }
 

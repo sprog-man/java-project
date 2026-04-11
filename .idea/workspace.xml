@@ -4,125 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="975f1c1a-c94f-4bfa-9db4-672f3a13d892" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/admin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/server.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/AuditList.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/controller/AdminOrderController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/controller/AdminPetController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/controller/AdminServiceController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/controller/AdminController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/AdminStatsResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/ChangePasswordRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/UpdateProfileRequest.java" afterDir="false" />
+    <list default="true" id="975f1c1a-c94f-4bfa-9db4-672f3a13d892" name="Changes" comment="v1.4 还剩下订单模块为完善以及部分后台按钮功能">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/AddPet-CXNlvoXF.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/AddPet-DBzauB80.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/CreateOrder-BlKypcJ-.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/CreateOrder-DgRjso_J.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/CreateReview-NAp9spQr.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/EditPet-DOMSUjIR.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/EditPet-eARORHP5.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Footer-3JPZgiHp.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Footer-CG1ZTIrl.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Home-BxxbWjhY.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Home-C_JJr7-6.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Login-BDY2CxII.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Login-Cz3408sR.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/OrderDetail-B3Nhu22y.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/OrderDetail-BHC-fMba.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/OrderList-CG56nSTW.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/OrderList-CPkPKJID.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/PaymentList-Dng0NPi2.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/PendingOrderList-BtIXJrSn.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/PendingOrderList-iUuyd-bM.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/PetDetail-Dzv9fUMH.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/PetDetail-I7vAggfN.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/PetList-4Q4USxVG.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/PetList-Cla9NaP0.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ProviderApply-BJ0BNUGw.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ProviderCenter-CwMgaZQT.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ProviderOrderDetail-BQLDN-8S.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ProviderOrderDetail-Dgs8U_3s.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ProviderOrderList-C3SK-jEk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ProviderReviewList-Doc_t0Tt.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Register-B3tJZoM2.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/Register-Dl0bSVui.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ReviewDetail-BHN3mB01.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ServiceTypeDetail-UcBpJKdM.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ServiceTypeDetail-rsnSNL0k.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ServiceTypeList-5mXSL9ma.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/ServiceTypeList-CeXuY-nf.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/UserCenter-DOPZXN1V.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/UserCenter-DjqCOZHw.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/UserReviewList-D3K_RQb6.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/index-CY29q2L-.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/index-DgbE6gO_.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/index-stnKa9-L.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/order-BBVW85z_.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/pet-C-tN5A1P.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/provider-DsRpx19b.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/review-Be4T7IdP.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/service-C2jOKIje.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/assets/user-XScxRg3Q.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/dist/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/dist/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/node_modules/.vite/deps/_metadata.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/components/layout/Footer.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/components/layout/Footer.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/router/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/store/order.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/order.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/store/pet.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/pet.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/store/provider.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/provider.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/store/service.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/service.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/store/user.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/user.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/AdminCenter.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/AdminCenter.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/AdminLogin.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/AdminLogin.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/store/admin.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/admin.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/OrderList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/OrderList.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/PetList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/PetList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/ReviewList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/ReviewList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/ServiceList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/ServiceList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/UserList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/UserList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/home/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/home/Home.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/CreateOrder.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/CreateOrder.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/OrderList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/OrderList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/PendingOrderList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/PendingOrderList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/ProviderOrderDetail.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/order/ProviderOrderDetail.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/pet/PetList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/pet/PetList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/service/ProviderApply.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/service/ProviderApply.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/service/ServiceTypeDetail.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/service/ServiceTypeDetail.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/service/ServiceTypeList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/service/ServiceTypeList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/user/EditUserInfo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/user/EditUserInfo.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/user/UserCenter.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/user/UserCenter.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/common/utils/RedisCacheUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/common/utils/RedisCacheUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/JwtAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/UserContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/infrastructure/security/UserContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/dto/OrderResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/controller/AdminOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/controller/AdminOrderController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/OrderService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/impl/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/impl/OrderServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/payment/dto/PaymentResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/payment/dto/PaymentResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/payment/entity/PaymentRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/payment/entity/PaymentRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/payment/service/impl/PaymentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/payment/service/impl/PaymentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/dto/PetResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/dto/PetResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/controller/AdminPetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/controller/AdminPetController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/PetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/PetService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/impl/PetServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/impl/PetServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/dto/ReviewResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/dto/ReviewResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/entity/Review.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/entity/Review.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/service/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/service/ReviewService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/service/impl/ReviewServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/review/service/impl/ReviewServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/controller/ServiceProviderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/controller/ServiceProviderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/dto/ServiceProviderApplyRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/dto/ServiceProviderApplyRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/entity/ServiceProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/entity/ServiceProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/entity/ServiceType.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/entity/ServiceType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/ServiceProviderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/ServiceProviderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/ServiceTypeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/ServiceTypeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/impl/ServiceProviderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/impl/ServiceProviderServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/impl/ServiceTypeServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/service/service/impl/ServiceTypeServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/dto/LoginResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/user/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/resources/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/resources/schema.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -258,6 +150,9 @@
       </set>
     </attachedChunks>
   </component>
+  <component name="StructureViewState">
+    <option name="selectedTab" value="Logical" />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="975f1c1a-c94f-4bfa-9db4-672f3a13d892" name="Changes" comment="" />
@@ -276,11 +171,47 @@
       <workItem from="1775746210572" duration="943000" />
       <workItem from="1775783392105" duration="25050000" />
       <workItem from="1775868130081" duration="183000" />
-      <workItem from="1775868332789" duration="18622000" />
+      <workItem from="1775868332789" duration="21369000" />
     </task>
+    <task id="LOCAL-00001" summary="v1.4 还剩下订单模块为完善以及部分后台按钮功能">
+      <option name="closed" value="true" />
+      <created>1775894600337</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1775894600337</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="v1.4 还剩下订单模块为完善以及部分后台按钮功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="v1.4 还剩下订单模块为完善以及部分后台按钮功能" />
   </component>
 </project>

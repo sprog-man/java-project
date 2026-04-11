@@ -41,6 +41,6 @@ public interface PetService {
     /*
     * 管理员获取所有宠物列表(分页)
     * */
-    Page<PetResponse> getAdminPetPage(int page,int size,String keyword);
+    Page<PetResponse> getAdminPetPage(int page,int size,String keyword,Integer type);
 
 }

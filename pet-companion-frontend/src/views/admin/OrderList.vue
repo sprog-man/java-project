@@ -12,21 +12,18 @@
         <button class="search-btn">搜索</button>
       </div>
       <div class="filter-box">
+        <!-- ✅ 1. 动态渲染状态筛选 -->
         <select v-model="filters.status" @change="handleFilter">
-          <option value="">全部状态</option>
-          <option value="PENDING_PAYMENT">待支付</option>
-          <option value="PENDING_ACCEPT">待接单</option>
-          <option value="IN_SERVICE">服务中</option>
-          <option value="COMPLETED">已完成</option>
-          <option value="CANCELLED">已取消</option>
+          <option v-for="opt in adminStore.orderStatusOptions" :key="opt.value" :value="opt.value">
+            {{ opt.label }}
+          </option>
         </select>
-        <select v-model="filters.serviceType" @change="handleFilter">
+        <!-- ✅ 2. 动态渲染服务类型筛选 -->
+        <select v-model="filters.serviceTypeId" @change="handleFilter">
           <option value="">全部服务类型</option>
-          <option value="1">宠物洗澡</option>
-          <option value="2">宠物寄养</option>
-          <option value="3">宠物美容</option>
-          <option value="4">宠物训练</option>
-          <option value="5">宠物医疗</option>
+          <option v-for="type in adminStore.serviceList" :key="type.id" :value="type.id">
+            {{ type.name }}
+          </option>
         </select>
       </div>
     </div>
@@ -47,14 +44,14 @@
           </tr>
         </thead>
         <tbody>
+        <!-- ✅ 3. 确保 orders 有数据再渲染 -->
         <tr v-for="order in orders" :key="order.id">
           <td>{{ order.orderNo }}</td>
-          <!-- ✅ 使用新增加的 userName 字段 -->
           <td>{{ order.userName || '未知用户' }}</td>
           <td>{{ order.serviceName }}</td>
           <td>{{ order.serviceTime }}</td>
           <td>¥{{ order.price ? Number(order.price).toFixed(2) : '0.00' }}</td>
-          <td>{{ getOrderStatusText(order.status) }}</td>
+          <td>{{ order.statusText }}</td>
           <td>{{ formatDate(order.createTime) }}</td>
           <td class="action-buttons">
             <button class="detail-btn" @click="viewOrderDetail(order.id)">详情</button>
@@ -84,7 +81,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- 订单详情对话框 -->
     <div class="modal" v-if="showDetailModal">
       <div class="modal-content">
@@ -94,54 +91,17 @@
         </div>
         <div class="modal-body">
           <div class="order-detail">
-            <div class="detail-item">
-              <label>订单号:</label>
-              <span>{{ currentOrder.orderNumber }}</span>
-            </div>
-            <div class="detail-item">
-              <label>用户:</label>
-              <span>{{ currentOrder.userName }}</span>
-            </div>
-            <div class="detail-item">
-              <label>服务类型:</label>
-              <span>{{ currentOrder.serviceName }}</span>
-            </div>
-            <div class="detail-item">
-              <label>服务时间:</label>
-              <span>{{ currentOrder.serviceTime }}</span>
-            </div>
-            <div class="detail-item">
-              <label>服务地址:</label>
-              <span>{{ currentOrder.serviceAddress }}</span>
-            </div>
-            <div class="detail-item">
-              <label>联系电话:</label>
-              <span>{{ currentOrder.phone }}</span>
-            </div>
-            <div class="detail-item">
-              <label>备注:</label>
-              <span>{{ currentOrder.notes || '无' }}</span>
-            </div>
-            <div class="detail-item">
-              <label>宠物信息:</label>
-              <span>{{ currentOrder.petName }} ({{ currentOrder.petType }})</span>
-            </div>
-            <div class="detail-item">
-              <label>金额:</label>
-              <span>¥{{ currentOrder.amount.toFixed(2) }}</span>
-            </div>
-            <div class="detail-item">
-              <label>状态:</label>
-              <span>{{ getOrderStatusText(currentOrder.status) }}</span>
-            </div>
-            <div class="detail-item">
-              <label>创建时间:</label>
-              <span>{{ formatDate(currentOrder.createTime) }}</span>
-            </div>
-            <div class="detail-item">
-              <label>更新时间:</label>
-              <span>{{ formatDate(currentOrder.updateTime) }}</span>
-            </div>
+            <!-- ✅ 4. 绑定 currentOrder 的真实字段 -->
+            <div class="detail-item"><label>订单号:</label><span>{{ currentOrder.orderNo }}</span></div>
+            <div class="detail-item"><label>用户:</label><span>{{ currentOrder.userName }}</span></div>
+            <div class="detail-item"><label>服务类型:</label><span>{{ currentOrder.serviceName }}</span></div>
+            <div class="detail-item"><label>服务时间:</label><span>{{ currentOrder.serviceTime }}</span></div>
+            <div class="detail-item"><label>服务地址:</label><span>{{ currentOrder.address }}</span></div>
+            <div class="detail-item"><label>联系电话:</label><span>{{ currentOrder.phone }}</span></div>
+            <div class="detail-item"><label>备注:</label><span>{{ currentOrder.notes || '无' }}</span></div>
+            <div class="detail-item"><label>宠物名称:</label><span>{{ currentOrder.petName }}</span></div>
+            <div class="detail-item"><label>金额:</label><span>¥{{ currentOrder.price }}</span></div>
+            <div class="detail-item"><label>状态:</label><span>{{ currentOrder.statusText }}</span></div>
           </div>
           <div class="modal-footer">
             <button class="close-modal-btn" @click="showDetailModal = false">关闭</button>
@@ -161,25 +121,12 @@ const orders = ref([])
 const currentPage = ref(1)
 const totalPages = ref(1)
 const searchQuery = ref('')
-const filters = ref({ status: '' })
+const filters = ref({ status: '', serviceTypeId: '' }) // ✅ 增加 serviceTypeId
+
 
 const pageSize = ref(10)
 const showDetailModal = ref(false)
-const currentOrder = ref({
-  orderNumber: '',
-  userName: '',
-  serviceName: '',
-  serviceTime: '',
-  serviceAddress: '',
-  phone: '',
-  notes: '',
-  petName: '',
-  petType: '',
-  amount: 0,
-  status: '',
-  createTime: '',
-  updateTime: ''
-})
+const currentOrder = ref({}) // ✅ 简化初始值
 
 const getOrderStatusText = (status) => {
   const statusMap = {
@@ -205,7 +152,7 @@ const handleSearch = () => {
 
 
 const handleFilter = () => {
-  // 实现筛选逻辑
+  currentPage.value = 1
   fetchOrders()
 }
 
@@ -214,26 +161,21 @@ const changePage = (page) => {
   fetchOrders()
 }
 
-const viewOrderDetail = (orderId) => {
-  // 实现查看订单详情逻辑
-  const order = orders.value.find(o => o.id === orderId)
-  if (order) {
-    currentOrder.value = {
-      orderNumber: order.orderNumber,
-      userName: order.userName,
-      serviceName: order.serviceName,
-      serviceTime: order.serviceTime,
-      serviceAddress: order.serviceAddress || '北京市朝阳区',
-      phone: order.phone || '13800138000',
-      notes: order.notes || '无',
-      petName: order.petName || '小狗狗',
-      petType: order.petType || '狗',
-      amount: order.amount,
-      status: order.status,
-      createTime: order.createTime,
-      updateTime: order.updateTime || order.createTime
+// ✅ 5. 修复详情查看逻辑
+const viewOrderDetail = async (orderId) => {
+  try {
+    // 方案 A：直接从当前列表里找（速度快）
+    const order = orders.value.find(o => o.id === orderId)
+    if (order) {
+      currentOrder.value = order
+      showDetailModal.value = true
     }
-    showDetailModal.value = true
+
+    // 方案 B（可选）：如果列表里的信息不全，可以再次请求后端详情接口
+    // const res = await axios.get(`/admin/orders/${orderId}`)
+    // currentOrder.value = res.data.data
+  } catch (error) {
+    console.error('获取订单详情失败', error)
   }
 }
 
@@ -244,9 +186,10 @@ const fetchOrders = async () => {
       page: currentPage.value,
       size: 10,
       status: filters.value.status || undefined,
+      serviceTypeId: filters.value.serviceTypeId || undefined, // ✅ 关键：把服务类型ID传给后端
       keyword: searchQuery.value || undefined
     }
-
+    console.log('正在发送筛选请求:', params) // ✅ 调试用：看看参数对不对
     const pageData = await adminStore.fetchOrderList(params)
     orders.value = pageData.records || []
     totalPages.value = pageData.pages || 1
@@ -255,8 +198,13 @@ const fetchOrders = async () => {
   }
 }
 
-onMounted(() => {
-  fetchOrders()
+onMounted(async () => {
+  // ✅ 6. 页面加载时并行获取所有必要数据
+  await Promise.all([
+    adminStore.fetchServiceList(), // 获取服务类型用于筛选
+    adminStore.fetchOrderStatusOptions(), // 获取状态选项用于筛选
+    fetchOrders() // 获取订单列表
+  ])
 })
 </script>
 

@@ -406,16 +406,24 @@ public class OrderServiceImpl implements OrderService {
     * 管理员获取订单列表
     * */
     @Override
-    public Page<OrderResponse> getAdminOrderPage(int page, int size, Integer status, String keyword) {
+    public Page<OrderResponse> getAdminOrderPage(int page, int size, String status, Long serviceTypeId, String keyword) {
         Page<Order> mpPage = new Page<>(page, size);
         LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
 
-        // 1. 筛选状态
-        if (status != null) {
-            wrapper.eq(Order::getStatus, status);
+        // 1. 筛选状态 (需要将前端的 String 映射回数据库的 Integer)
+        if (status != null && !status.isEmpty()) {
+            Integer dbStatus = mapStatusStringToInt(status);
+            if (dbStatus != null) {
+                wrapper.eq(Order::getStatus, dbStatus);
+            }
         }
 
-        // 2. 关键词搜索（搜索订单号或手机号）
+        // 2. 筛选服务类型
+        if (serviceTypeId != null) {
+            wrapper.eq(Order::getServiceTypeId, serviceTypeId);
+        }
+
+        // 3. 关键词搜索（搜索订单号或手机号）
         if (keyword != null && !keyword.isEmpty()) {
             wrapper.and(w -> w.like(Order::getOrderNo, keyword)
                     .or()
@@ -437,4 +445,19 @@ public class OrderServiceImpl implements OrderService {
 
         return responsePage;
     }
+
+    /**
+     * ✅ 辅助方法：将前端的状态字符串映射为数据库的 Integer
+     */
+    private Integer mapStatusStringToInt(String statusStr) {
+        switch (statusStr) {
+            case "PENDING_PAYMENT": return 1;
+            case "PENDING": return 2;
+            case "IN_SERVICE": return 3; // 或者是 4，取决于你具体的状态定义
+            case "COMPLETED": return 5;
+            case "CANCELLED": return 6;
+            default: return null;
+        }
+    }
+
 }
