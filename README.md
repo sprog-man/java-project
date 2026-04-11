@@ -76,52 +76,29 @@
 
 ```
 com.petcompany.platform/
-├── PetCompanionApplication.java          # 项
-目启动类
-├── config/                               # 配
-置类
-│   ├── AsyncConfig.java                  # 异
-步任务配置
-│   ├── SwaggerConfig.java                # 
-Swagger 配置
-│   └── WebMvcConfig.java                 # 
-Web MVC 配置
-├── common/                               # 公
-共类
-│   ├── constant/                         # 常
-量
-│   ├── exception/                        # 异
-常处理
-│   ├── result/                           # 统
-一返回结果
-│   ├── service/                          # 公
-共服务
-│   └── utils/                            # 工
-具类
-├── infrastructure/                       # 基
-础设施
-│   └── security/                         # 安
-全配置
-│       ├── annotation/                   # 注
-解
-│       └── interceptor/                  # 拦
-截器
-└── modules/                              # 业
-务模块
-    ├── common/                           # 公
-    共模块
-    ├── order/                            # 订
-    单模块
-    ├── pet/                              # 宠
-    物模块
-    ├── payment/                          # 支
-    付模块
-    ├── review/                           # 评
-    价模块
-    ├── service/                          # 服
-    务模块
-    └── user/                             # 用
-    户模块
+├── PetCompanionApplication.java          # 项目启动类
+├── config/                               # 配置类
+│   ├── AsyncConfig.java                  # 异步任务配置
+│   ├── SwaggerConfig.java                # Swagger 配置
+│   └── WebMvcConfig.java                 # Web MVC 配置
+├── common/                               # 公共类
+│   ├── constant/                         # 常量
+│   ├── exception/                        # 异常处理
+│   ├── result/                           # 统一返回结果
+│   ├── service/                          # 公共服务
+│   └── utils/                            # 工具类
+├── infrastructure/                       # 基础设施
+│   └── security/                         # 安全配置
+│       ├── annotation/                   # 注解
+│       └── interceptor/                  # 拦截器
+└── modules/                              # 业务模块
+    ├── common/                           # 公共模块
+    ├── order/                            # 订单模块
+    ├── pet/                              # 宠物模块
+    ├── payment/                          # 支付模块
+    ├── review/                           # 评 价模块
+    ├── service/                          # 服务模块
+    └── user/                             # 用户模块
 ```
 
 ### 2. 模块职责
