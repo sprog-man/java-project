@@ -4,17 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="975f1c1a-c94f-4bfa-9db4-672f3a13d892" name="Changes" comment="v1.4 还剩下订单模块为完善以及部分后台按钮功能">
+    <list default="true" id="975f1c1a-c94f-4bfa-9db4-672f3a13d892" name="Changes" comment="v1.5 还剩下订单模块未完善">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/store/admin.js" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/store/admin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/OrderList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/OrderList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/PetList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pet-companion-frontend/src/views/admin/PetList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/controller/AdminOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/controller/AdminOrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/impl/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/order/service/impl/OrderServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/controller/AdminPetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/controller/AdminPetController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/PetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/PetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/impl/PetServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/platform/src/main/java/com/petcompany/platform/modules/pet/service/impl/PetServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,47 +56,47 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.test.executor": "Run",
-    "Downloaded.Files.Path.Enabled": "false",
-    "JavaMethodFindUsagesOptions.isImplementingMethods": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.PetCompanionApplication.executor": "Run",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Java-project/Testdemo",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "通义灵码",
-    "ts.external.directory.path": "D:\\IntelliJ IDEA 2025.3.4\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.test.executor&quot;: &quot;Run&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;JavaMethodFindUsagesOptions.isImplementingMethods&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.PetCompanionApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Java-project/Testdemo&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;通义灵码&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\IntelliJ IDEA 2025.3.4\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "vue.recent.templates": [
-      "Vue Composition API Component",
-      "Vue Options API Component"
+  &quot;keyToStringList&quot;: {
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;,
+      &quot;Vue Options API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Spring Boot.PetCompanionApplication">
     <configuration name="test" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.petcompany.platform.test" />
@@ -171,7 +162,7 @@
       <workItem from="1775746210572" duration="943000" />
       <workItem from="1775783392105" duration="25050000" />
       <workItem from="1775868130081" duration="183000" />
-      <workItem from="1775868332789" duration="21369000" />
+      <workItem from="1775868332789" duration="22495000" />
     </task>
     <task id="LOCAL-00001" summary="v1.4 还剩下订单模块为完善以及部分后台按钮功能">
       <option name="closed" value="true" />
@@ -181,7 +172,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775894600337</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="v1.5 还剩下订单模块未完善">
+      <option name="closed" value="true" />
+      <created>1775897366654</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1775897366654</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -212,6 +211,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="v1.4 还剩下订单模块为完善以及部分后台按钮功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="v1.4 还剩下订单模块为完善以及部分后台按钮功能" />
+    <MESSAGE value="v1.5 还剩下订单模块未完善" />
+    <option name="LAST_COMMIT_MESSAGE" value="v1.5 还剩下订单模块未完善" />
   </component>
 </project>
