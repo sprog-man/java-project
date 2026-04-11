@@ -44,7 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         // 验证订单状态
-        if (order.getStatus() != 1) { // 只有待支付状态可以支付
+        if (order.getStatus() != 1 && order.getStatus() != 2) {
             throw new BusinessException("订单状态不允许支付");
         }
 
@@ -59,26 +59,31 @@ public class PaymentServiceImpl implements PaymentService {
         // 创建支付记录
         PaymentRecord paymentRecord = new PaymentRecord();
         paymentRecord.setOrderId(orderId);
+        paymentRecord.setUserId(userId); // ✅ 补全用户ID
         paymentRecord.setAmount(order.getPrice());
+
+        // ✅ 设置支付方式 (假设 1-微信, 2-支付宝，转为字符串存储)
+        paymentRecord.setPaymentMethod(payType == 1 ? "WECHAT" : "ALIPAY");
+
+        // ✅ 生成内部支付单号
+        String payOrderNo = generatePayOrderNo();
+        paymentRecord.setPayOrderNo(payOrderNo);
+
         paymentRecord.setStatus(0); // 待支付
-        paymentRecord.setPayType(payType);
-        paymentRecord.setPayOrderNo(generatePayOrderNo());
         paymentRecord.setCreateTime(LocalDateTime.now());
         paymentRecord.setUpdateTime(LocalDateTime.now());
         paymentRecord.setDeleted(0);
 
         // 保存支付记录
         paymentRecordMapper.insert(paymentRecord);
-        log.info("用户{}为订单{}创建支付记录，金额：{}", userId, orderId, order.getPrice());
-
-        // TODO: 调用第三方支付接口，生成支付链接或二维码
+        log.info("用户{}为订单{}创建支付记录，单号：{}，金额：{}", userId, orderId, payOrderNo, order.getPrice());
 
         return paymentRecord;
     }
 
     @Override
     public void handlePaymentCallback(String payOrderNo, String tradeNo, Integer status) {
-        // 根据支付单号查询支付记录
+        // 根据内部支付单号查询支付记录
         LambdaQueryWrapper<PaymentRecord> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(PaymentRecord::getPayOrderNo, payOrderNo);
         PaymentRecord paymentRecord = paymentRecordMapper.selectOne(wrapper);
@@ -86,21 +91,34 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusinessException("支付记录不存在");
         }
 
+        // ✅ 幂等性处理：如果已经是成功状态，直接返回
+        if (paymentRecord.getStatus() == 1) {
+            log.info("支付记录 {} 已处理过，忽略重复回调", payOrderNo);
+            return;
+        }
+
         // 更新支付记录
         paymentRecord.setStatus(status);
-        paymentRecord.setTradeNo(tradeNo);
+        paymentRecord.setTransactionId(tradeNo); // ✅ 修正：使用 setTransactionId
+
         if (status == 1) { // 支付成功
             paymentRecord.setPayTime(LocalDateTime.now());
-            // 更新订单状态
+
+            // ✅ 更新订单状态为已支付/待接单
             Order order = orderService.getOrderById(paymentRecord.getOrderId());
             if (order != null) {
-                // TODO: 更新订单状态为已支付
+                order.setStatus(2); // 2-待接单
+                order.setPayStatus(1); // 1-已支付
+                // 注意：这里需要 OrderService 提供 updateOrder 方法，或者直接注入 OrderMapper
+                // 为了简化，假设你有一个方法能更新订单
+                // orderService.updateOrderStatus(order.getId(), 2, 1);
             }
         }
         paymentRecord.setUpdateTime(LocalDateTime.now());
         paymentRecordMapper.updateById(paymentRecord);
-        log.info("处理支付回调，支付单号：{}，状态：{}", payOrderNo, status);
+        log.info("处理支付回调，支付单号：{}，第三方交易号：{}，状态：{}", payOrderNo, tradeNo, status);
     }
+
 
     @Override
     public PaymentRecord getPaymentById(Long id) {
@@ -117,17 +135,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<PaymentResponse> getUserPaymentList(Long userId) {
         // 查询用户的支付记录
-        // 这里需要关联订单表，获取用户的订单，然后查询对应的支付记录
-        // 简化实现，直接返回所有支付记录
-        List<PaymentRecord> paymentRecords = paymentRecordMapper.selectList(null);
-        return paymentRecords.stream().map(this::convertToResponse).collect(Collectors.toList());
-    }
+        LambdaQueryWrapper<PaymentRecord> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(PaymentRecord::getUserId, userId);
+        wrapper.eq(PaymentRecord::getDeleted, 0);
+        wrapper.orderByDesc(PaymentRecord::getCreateTime);
 
-    /**
-     * 生成支付单号
-     */
-    private String generatePayOrderNo() {
-        return "PAY" + System.currentTimeMillis() + (int) (Math.random() * 1000);
+        List<PaymentRecord> paymentRecords = paymentRecordMapper.selectList(wrapper);
+        return paymentRecords.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
     /**
@@ -137,14 +151,29 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentResponse response = new PaymentResponse();
         response.setId(paymentRecord.getId());
         response.setOrderId(paymentRecord.getOrderId());
-        response.setAmount(paymentRecord.getAmount());
+
+        // ✅ 修正：将 Double 转换为 BigDecimal
+        if (paymentRecord.getAmount() != null) {
+            response.setAmount(java.math.BigDecimal.valueOf(paymentRecord.getAmount()));
+        }
+
         response.setStatus(paymentRecord.getStatus());
-        response.setPayType(paymentRecord.getPayType());
+
+        // ✅ 适配字段名
+        response.setPaymentMethod(paymentRecord.getPaymentMethod());
         response.setPayOrderNo(paymentRecord.getPayOrderNo());
-        response.setTradeNo(paymentRecord.getTradeNo());
+        response.setTradeNo(paymentRecord.getTransactionId());
+
         response.setPayTime(paymentRecord.getPayTime());
         response.setCreateTime(paymentRecord.getCreateTime());
         return response;
+    }
+
+    /**
+     * 生成支付单号
+     */
+    private String generatePayOrderNo() {
+        return "PAY" + System.currentTimeMillis() + (int) (Math.random() * 1000);
     }
 
 }

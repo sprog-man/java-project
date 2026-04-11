@@ -2,6 +2,7 @@ package com.petcompany.platform.modules.payment.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -23,7 +24,7 @@ public class PaymentResponse {
     /**
      * 支付金额
      */
-    private Double amount;
+    private BigDecimal amount;
 
     /**
      * 支付状态：0-待支付，1-支付成功，2-支付失败
@@ -33,7 +34,7 @@ public class PaymentResponse {
     /**
      * 支付方式：1-微信支付，2-支付宝
      */
-    private Integer payType;
+    private String paymentMethod;
 
     /**
      * 支付单号

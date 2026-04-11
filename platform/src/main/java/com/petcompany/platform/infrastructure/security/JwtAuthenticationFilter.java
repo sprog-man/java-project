@@ -46,12 +46,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader(header);
         
         log.debug("接收到的Authorization头: {}", authHeader);
-        
+
         // 提取Token（去掉Bearer前缀）
         String token = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
         }
+
+        log.info("JWT 过滤器捕获到 Token: {}", token != null ? "存在" : "不存在"); // ✅ 加这行
+
 
         if (token != null && !token.isEmpty()) {
             try {
@@ -65,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // 设置认证信息
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                        userId, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 

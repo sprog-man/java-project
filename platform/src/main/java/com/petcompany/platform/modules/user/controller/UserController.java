@@ -1,13 +1,10 @@
 package com.petcompany.platform.modules.user.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.common.exception.BusinessException;
 import com.petcompany.platform.common.result.Result;
 import com.petcompany.platform.common.result.ResultCode;
-import com.petcompany.platform.modules.user.dto.AdminLoginRequest;
-import com.petcompany.platform.modules.user.dto.AdminLoginResponse;
-import com.petcompany.platform.modules.user.dto.LoginRequest;
-import com.petcompany.platform.modules.user.dto.LoginResponse;
-import com.petcompany.platform.modules.user.dto.RegisterRequest;
+import com.petcompany.platform.modules.user.dto.*;
 import com.petcompany.platform.modules.user.entity.User;
 import com.petcompany.platform.modules.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -79,11 +76,21 @@ public class UserController {
     * 更新用户信息
     * */
     @PutMapping("/center/modify")
-    public Result<?> updateUser(@Valid @RequestBody User user) {
-        log.info("接收到更新用户信息请求: userId={}, username={}", user.getId(), user.getUsername());
-         userService.updateUser(user);
-        log.info("用户信息更新成功: userId={}, username={}", user.getId(), user.getUsername());
+    public Result<?> updateUser(@Valid @RequestBody  UpdateProfileRequest request) {
+        // 1. 从 Spring Security 上下文中获取当前登录用户的 ID
+        // 这一步至关重要：它确保了操作只能针对“自己”进行，防止水平越权
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()){
+            return Result.fail(ResultCode.UNAUTHORIZED);
+        }
+        // 假设 Principal 存储的是 userId (Long 类型)
+        Long userId = (Long) authentication.getPrincipal();
+        log.info("接收到更新用户信息请求: userId={},nickname={}", userId,request.getNickname());
+        // 2. 将 DTO 和 userId 传递给 Service 层处理
+        userService.updateUser(userId, request);
+        log.info("用户信息更新成功: userId={}", userId);
         return Result.success("用户信息更新成功");
+
     }
     /*前端获取用户信息
     * */
@@ -99,4 +106,27 @@ public class UserController {
             return Result.fail(ResultCode.SYSTEM_ERROR);
         }
     }
+    /*
+    * 修改密码
+    * */
+    @PutMapping("/center/password")
+    public Result<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        // 1. 从 Spring Security 上下文中获取当前登录用户的 ID
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Result.fail(ResultCode.UNAUTHORIZED);
+        }
+        // 因为我们在 JwtAuthenticationFilter 里存入了 Long 类型的 userId
+        Long userId = (Long) authentication.getPrincipal();
+        log.info("接收到修改密码请求: userId={}", userId);
+
+        // 2. 调用 Service 层处理业务逻辑
+        userService.changePassword(userId, request.getOldPassword(), request.getNewPassword());
+        log.info("密码修改成功: userId={}", userId);
+        return Result.success("密码修改成功");
+
+    }
+
+
 }
+

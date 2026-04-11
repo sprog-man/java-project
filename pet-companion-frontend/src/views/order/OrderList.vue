@@ -21,17 +21,18 @@
           <div class="order-no">订单号：{{ order.orderNo }}</div>
           <div class="order-status" :class="`status-${order.status}`">{{ order.statusText }}</div>
         </div>
-        
+
         <div class="order-content">
           <div class="service-info">
             <h3>{{ order.serviceName }}</h3>
             <p>{{ order.serviceTime }}</p>
           </div>
-          <div class="order-price">¥{{ order.price }}</div>
+          <!-- ✅ 修改：使用 toFixed(2) 确保显示两位小数 -->
+          <div class="order-price">¥{{ Number(order.price).toFixed(2) }}</div>
         </div>
         
         <div class="order-actions">
-          <router-link :to="`/user/orders/${order.id}`" class="btn-outline">查看详情</router-link>
+          <router-link :to="`/order/${order.id}`" class="btn-outline">查看详情</router-link>
           <button 
             v-if="order.status === 'PENDING' " 
             class="btn-primary" 
@@ -66,8 +67,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
+<script setup>import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
@@ -75,7 +75,7 @@ import { useOrderStore } from '../../store/order'
 
 const router = useRouter()
 const orderStore = useOrderStore()
-const orders = ref([])
+const orders = ref([]) // ✅ 这里的 orders 将从 Store 同步过来
 const currentStatus = ref('ALL')
 
 // 筛选后的订单
@@ -101,8 +101,7 @@ const cancelOrder = async (id) => {
   if (confirm('确定要取消这个订单吗？')) {
     try {
       await orderStore.cancelOrder(id)
-      // 重新获取订单列表
-      await orderStore.getOrderList()
+      await orderStore.getOrderList() // ✅ 重新刷新列表
     } catch (error) {
       console.error('取消订单失败', error)
     }
@@ -123,40 +122,10 @@ const reviewOrder = (id) => {
 
 onMounted(async () => {
   try {
-    // 这里应该从后端获取订单列表
-    // 暂时使用模拟数据
-    orders.value = [
-      {
-        id: 1,
-        orderNo: '20260405001',
-        serviceName: '宠物陪伴',
-        serviceTime: '2026-04-10 14:00-16:00',
-        price: 100,
-        status: 'PENDING_PAYMENT',
-        statusText: '待支付',
-        reviewed: false
-      },
-      {
-        id: 2,
-        orderNo: '20260405002',
-        serviceName: '宠物遛弯',
-        serviceTime: '2026-04-08 09:00-10:00',
-        price: 40,
-        status: 'COMPLETED',
-        statusText: '已完成',
-        reviewed: false
-      },
-      {
-        id: 3,
-        orderNo: '20260405003',
-        serviceName: '宠物喂食',
-        serviceTime: '2026-04-05 12:00-12:30',
-        price: 30,
-        status: 'CANCELLED',
-        statusText: '已取消',
-        reviewed: false
-      }
-    ]
+    // ✅ 调用 Store 获取真实数据
+    await orderStore.getOrderList()
+    orders.value = orderStore.orders || []
+    console.log('当前用户的真实订单:', orders.value)
   } catch (error) {
     console.error('获取订单列表失败', error)
   }

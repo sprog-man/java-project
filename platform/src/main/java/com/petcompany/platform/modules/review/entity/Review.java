@@ -1,6 +1,7 @@
 package com.petcompany.platform.modules.review.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -31,14 +32,22 @@ public class Review {
     private Long userId;
 
     /**
+     * 被评价用户ID（对应数据库 target_id）
+     */
+    @TableField("target_id") // ✅ 显式映射
+    private Long targetId;
+
+    /**
      * 服务提供者ID
      */
     private Long providerId;
 
+
     /**
-     * 评分：1-5星
+     * 评分：1-5星（对应数据库 rating）
      */
-    private Integer score;
+    @TableField("rating") // ✅ 显式映射
+    private Integer rating;
 
     /**
      * 评价内容
@@ -50,10 +59,7 @@ public class Review {
      */
     private String images;
 
-    /**
-     * 回复内容
-     */
-    private String reply;
+
 
     /**
      * 创建时间

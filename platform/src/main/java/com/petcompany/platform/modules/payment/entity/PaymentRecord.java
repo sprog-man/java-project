@@ -1,6 +1,7 @@
 package com.petcompany.platform.modules.payment.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -26,34 +27,44 @@ public class PaymentRecord {
     private Long orderId;
 
     /**
+     * 用户ID
+     */
+    private Long userId;
+
+    /**
      * 支付金额
      */
     private Double amount;
+
+    /**
+     * 支付方式（对应数据库 payment_method）
+     */
+    @TableField("payment_method") // ✅ 显式映射
+    private String paymentMethod;
+
+    /**
+     * 内部支付单号（用于关联业务）
+     */
+    @TableField("pay_order_no")
+    private String payOrderNo;
+
+    /**
+     * 交易号（对应数据库 transaction_id）
+     */
+    @TableField("transaction_id") // ✅ 显式映射
+    private String transactionId;
+
+    /**
+     * 支付时间
+     */
+    private LocalDateTime payTime;
+
 
     /**
      * 支付状态：0-待支付，1-支付成功，2-支付失败
      */
     private Integer status;
 
-    /**
-     * 支付方式：1-微信支付，2-支付宝
-     */
-    private Integer payType;
-
-    /**
-     * 支付单号
-     */
-    private String payOrderNo;
-
-    /**
-     * 交易单号
-     */
-    private String tradeNo;
-
-    /**
-     * 支付时间
-     */
-    private LocalDateTime payTime;
 
     /**
      * 创建时间

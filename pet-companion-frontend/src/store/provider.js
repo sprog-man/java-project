@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import api from '../api/index'
+import axios from '../api/axios' // ✅ 1. 修正导入：引入 axios 实例
+
 
 export const useProviderStore = defineStore('provider', {
   state: () => ({
@@ -36,20 +37,26 @@ export const useProviderStore = defineStore('provider', {
         this.isLoading = false
       }
     },
-    
+
     // 申请成为服务提供者
-    async applyProvider(data) {
+    async applyProvider(formData) {
       this.isLoading = true
-      this.error = null
       try {
-        // 这里应该调用后端API申请成为服务提供者
-        console.log('申请成为服务提供者:', data)
-        // 模拟成功
-        return true
+        // ✅ 2. 简化逻辑：因为前端表单字段已对齐 DTO，直接发送 formData 即可
+        console.log('正在向后端发送申请:', formData)
+
+        // 注意：这里使用导入的 axios，而不是 api
+        const response = await axios.post('/service-provider/apply', formData)
+
+        if (response.data.code === 200) {
+          alert('申请提交成功，请等待管理员审核')
+          return response.data
+        } else {
+          throw new Error(response.data.msg || '申请失败')
+        }
       } catch (error) {
-        this.error = error.message
-        console.error('申请服务提供者失败', error)
-        throw error
+        console.error('申请服务者失败:', error)
+        throw error // 抛出错误让组件层处理提示
       } finally {
         this.isLoading = false
       }

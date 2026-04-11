@@ -122,12 +122,17 @@
           <h3>订单金额</h3>
           <div class="order-price">
             <div class="price-item">
-              <span class="price-label">服务费用：</span>
-              <span class="price-value">¥{{ orderPrice }}</span>
+              <!-- ✅ 4. 展示 Store 计算出的各项费用 -->
+              <span class="price-label">基础费用（{{ priceDetails.hours }}小时）：</span>
+              <span class="price-value">¥{{ priceDetails.basePrice }}</span>
+            </div>
+            <div class="price-item">
+              <span class="price-label">服务费用（5%）：</span>
+              <span class="price-value">¥{{ priceDetails.serviceFee }}</span>
             </div>
             <div class="price-item total">
               <span class="price-label">总计：</span>
-              <span class="price-value total">¥{{ orderPrice }}</span>
+              <span class="price-value total">¥{{ priceDetails.totalPrice }}</span>
             </div>
           </div>
         </div>
@@ -146,19 +151,21 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup>import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
-import { useOrderStore } from '../../store/order'
+import { useOrderStore } from '../../store/order' // ✅ 引入 orderStore
 import { useServiceStore } from '../../store/service'
 import { usePetStore } from '../../store/pet'
+import { useUserStore } from '../../store/user'
 
 const router = useRouter()
-const orderStore = useOrderStore()
+const route = useRoute()
+const orderStore = useOrderStore() // ✅ 初始化 orderStore
 const serviceStore = useServiceStore()
 const petStore = usePetStore()
+const userStore = useUserStore()
 
 // 服务类型列表
 const serviceTypes = ref([])
@@ -178,85 +185,84 @@ const orderForm = ref({
 // 加载状态
 const isLoading = ref(false)
 
-// 计算订单金额
-const orderPrice = computed(() => {
+// ✅ 1. 获取当前选中的服务单价
+const currentServicePrice = computed(() => {
   const selectedService = serviceTypes.value.find(s => s.id === orderForm.value.serviceType)
-  if (!selectedService) return 0
-  
-  // 简单计算：服务时长（小时）* 单价
-  const startTime = new Date(`2000-01-01 ${orderForm.value.serviceStartTime}`)
-  const endTime = new Date(`2000-01-01 ${orderForm.value.serviceEndTime}`)
-  const hours = (endTime - startTime) / (1000 * 60 * 60)
-  
-  return Math.round(selectedService.price * hours)
+  return selectedService ? selectedService.price : 0
+})
+
+// ✅ 2. 调用 Store 里的方法进行计算
+const priceDetails = computed(() => {
+  return orderStore.calculateOrderPrice(
+      currentServicePrice.value,
+      orderForm.value.serviceStartTime,
+      orderForm.value.serviceEndTime
+  )
 })
 
 // 处理表单提交
-    const handleSubmit = async () => {
-      isLoading.value = true
-      try {
-        const orderData = {
-          ...orderForm.value,
-          serviceTime: `${orderForm.value.serviceDate} ${orderForm.value.serviceStartTime}-${orderForm.value.serviceEndTime}`,
-          price: orderPrice.value
-        }
-        
-        await orderStore.createOrder(orderData)
-        // 跳转到订单列表
-        router.push('/user/orders')
-      } catch (error) {
-        console.error('创建订单失败', error)
-      } finally {
-        isLoading.value = false
-      }
+const handleSubmit = async () => {
+  console.log('--- 开始提交订单 ---') // ✅ 1. 确认函数被触发了
+
+  // ✅ 2. 简单的非空校验
+  if (!orderForm.value.petId || !orderForm.value.serviceType) {
+    alert('请选择宠物和服务类型！')
+    return
+  }
+
+  isLoading.value = true
+  try {
+    const orderData = {
+      serviceType: Number(orderForm.value.serviceType),
+      serviceDate: orderForm.value.serviceDate,
+      serviceStartTime: orderForm.value.serviceStartTime,
+      serviceEndTime: orderForm.value.serviceEndTime,
+      petId: Number(orderForm.value.petId),
+      address: orderForm.value.address,
+      phone: orderForm.value.phone,
+      notes: orderForm.value.notes,
+      price: priceDetails.value.totalPrice
     }
+
+    console.log('✅ 准备发送给后端的数据:', JSON.stringify(orderData)) // ✅ 3. 查看数据
+
+    const result = await orderStore.createOrder(orderData)
+    console.log('✅ 后端返回结果:', result)
+
+    // ✅ 4. 跳转到订单列表页（根据你的路由配置，通常是这个路径）
+    router.push('/user/orders')
+  } catch (error) {
+    console.error('❌ 创建订单彻底失败', error)
+    // ✅ 5. 把后端的报错弹出来
+    const msg = error.response?.data?.message || error.message || '未知错误'
+    alert('创建订单失败: ' + msg)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 onMounted(async () => {
   try {
-    // 这里应该从后端获取服务类型和宠物列表
-    // 暂时使用模拟数据
-    serviceTypes.value = [
-      {
-        id: 1,
-        name: '宠物陪伴',
-        price: 50
-      },
-      {
-        id: 2,
-        name: '宠物喂食',
-        price: 30
-      },
-      {
-        id: 3,
-        name: '宠物遛弯',
-        price: 40
-      },
-      {
-        id: 4,
-        name: '宠物清洁',
-        price: 60
-      }
-    ]
-    
-    pets.value = [
-      {
-        id: 1,
-        name: '小白',
-        breed: '萨摩耶'
-      },
-      {
-        id: 2,
-        name: '小黑',
-        breed: '英短'
-      },
-      {
-        id: 3,
-        name: '小橘',
-        breed: '橘猫'
-      }
-    ]
+    // 1. 获取服务类型
+    await serviceStore.fetchServiceTypes()
+    serviceTypes.value = serviceStore.serviceTypes || []
+
+    // 2. 获取我的宠物 (现在这个方法存在了)
+    await petStore.fetchMyPets()
+    pets.value = petStore.myPets || []
+
+    // 3. 预填用户手机号
+    if (!userStore.getUser) {
+      await userStore.getUserInfo()
+    }
+    orderForm.value.phone = userStore.getUser?.phone || ''
+
+    // 4. 自动选中服务类型
+    if (route.query.serviceId) {
+      orderForm.value.serviceType = Number(route.query.serviceId)
+    }
   } catch (error) {
-    console.error('获取数据失败', error)
+    console.error('获取初始化数据失败', error)
   }
 })
 </script>

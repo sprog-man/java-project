@@ -1,9 +1,6 @@
 package com.petcompany.platform.modules.service.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -29,17 +26,15 @@ public class ServiceType {
     /**
      * 服务描述
      */
+    @TableField(value = "description", jdbcType = org.apache.ibatis.type.JdbcType.LONGVARCHAR)
     private String description;
 
     /**
-     * 基础价格
+     * 服务价格 (每小时)
      */
-    private Double basePrice;
+    @TableField("price")
+    private Double price;
 
-    /**
-     * 每小时价格
-     */
-    private Double pricePerHour;
 
     /**
      * 创建时间

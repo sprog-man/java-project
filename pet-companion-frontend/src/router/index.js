@@ -41,40 +41,46 @@ const router = createRouter({
       component: () => import('../views/admin/AdminLogin.vue') // 动态导入管理员登录组件
     },
     {
-      path: '/admin/center', // 管理员后台首页路径
-      name: 'adminCenter', // 路由名称
-      component: () => import('../views/admin/AdminCenter.vue'), // 动态导入管理员后台首页组件
-      meta: { requiresAuth: true, requiresAdmin: true } // 路由元信息，需要登录和管理员权限
-    },
-    {
-      path: '/admin/users', // 管理员用户管理路径
-      name: 'adminUserList', // 路由名称
-      component: () => import('../views/admin/UserList.vue'), // 动态导入用户管理组件
-      meta: { requiresAuth: true, requiresAdmin: true } // 路由元信息，需要登录和管理员权限
-    },
-    {
-      path: '/admin/services', // 管理员服务管理路径
-      name: 'adminServiceList', // 路由名称
-      component: () => import('../views/admin/ServiceList.vue'), // 动态导入服务管理组件
-      meta: { requiresAuth: true, requiresAdmin: true } // 路由元信息，需要登录和管理员权限
-    },
-    {
-      path: '/admin/orders', // 管理员订单管理路径
-      name: 'adminOrderList', // 路由名称
-      component: () => import('../views/admin/OrderList.vue'), // 动态导入订单管理组件
-      meta: { requiresAuth: true, requiresAdmin: true } // 路由元信息，需要登录和管理员权限
-    },
-    {
-      path: '/admin/pets', // 管理员宠物管理路径
-      name: 'adminPetList', // 路由名称
-      component: () => import('../views/admin/PetList.vue'), // 动态导入宠物管理组件
-      meta: { requiresAuth: true, requiresAdmin: true } // 路由元信息，需要登录和管理员权限
-    },
-    {
-      path: '/admin/reviews', // 管理员评价管理路径
-      name: 'adminReviewList', // 路由名称
-      component: () => import('../views/admin/ReviewList.vue'), // 动态导入评价管理组件
-      meta: { requiresAuth: true, requiresAdmin: true } // 路由元信息，需要登录和管理员权限
+      path: '/admin', // 管理员根路径
+      component: () => import('../components/layout/AdminLayout.vue'), // 使用管理员布局组件
+      meta: { requiresAuth: true, requiresAdmin: true }, // 路由元信息，需要登录和管理员权限
+      children: [
+        {
+          path: 'center', // 管理员后台首页路径
+          name: 'adminCenter', // 路由名称
+          component: () => import('../views/admin/AdminCenter.vue'), // 动态导入管理员后台首页组件
+        },
+        {
+          path: 'users', // 管理员用户管理路径
+          name: 'adminUserList', // 路由名称
+          component: () => import('../views/admin/UserList.vue'), // 动态导入用户管理组件
+        },
+        {
+          path: 'services', // 管理员服务管理路径
+          name: 'adminServiceList', // 路由名称
+          component: () => import('../views/admin/ServiceList.vue'), // 动态导入服务管理组件
+        },
+        {
+          path: 'orders', // 管理员订单管理路径
+          name: 'adminOrderList', // 路由名称
+          component: () => import('../views/admin/OrderList.vue'), // 动态导入订单管理组件
+        },
+        {
+          path: 'pets', // 管理员宠物管理路径
+          name: 'adminPetList', // 路由名称
+          component: () => import('../views/admin/PetList.vue'), // 动态导入宠物管理组件
+        },
+        {
+          path: 'reviews', // 管理员评价管理路径
+          name: 'adminReviewList', // 路由名称
+          component: () => import('../views/admin/ReviewList.vue'), // 动态导入评价管理组件
+        },
+        {
+          path: 'audit', // 访问路径 /admin/audit
+          name: 'AdminAudit',
+          component: () => import('../views/admin/AuditList.vue') // 指向新文件
+        }
+      ]
     },
 
     {
@@ -87,6 +93,12 @@ const router = createRouter({
       path: '/user/edit', // 用户编辑信息路径
       name: 'editUserInfo',
       component: () => import('../views/user/EditUserInfo.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/user/change-password', // 修改密码路径
+      name: 'changePassword',
+      component: () => import('../views/user/ChangePassword.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -145,6 +157,24 @@ const router = createRouter({
     },
     
     // 服务提供者路由，需要登录
+    {
+      path: '/server/dashboard', // 服务者仪表盘路径
+      name: 'serverDashboard', // 路由名称
+      component: () => import('../views/server/Dashboard.vue'), // 动态导入服务者仪表盘组件
+      meta: { requiresAuth: true } // 路由元信息，需要登录
+    },
+    {
+      path: '/server/order-hall', // 服务者订单大厅路径
+      name: 'serverOrderHall', // 路由名称
+      component: () => import('../views/server/OrderHall.vue'), // 动态导入服务者订单大厅组件
+      meta: { requiresAuth: true } // 路由元信息，需要登录
+    },
+    {
+      path: '/server/order-management', // 服务者订单管理路径
+      name: 'serverOrderManagement', // 路由名称
+      component: () => import('../views/server/OrderManagement.vue'), // 动态导入服务者订单管理组件
+      meta: { requiresAuth: true } // 路由元信息，需要登录
+    },
     {
       path: '/provider/apply', // 服务提供者申请路径
       name: 'providerApply', // 路由名称

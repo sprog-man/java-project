@@ -40,4 +40,8 @@ public interface ReviewService {
      */
     List<ReviewResponse> getProviderReviewList(Long providerId);
 
+    /*
+    * 暴露接口给其他模块调用，统计评价数据
+    * */
+    long countAllReview();
 }

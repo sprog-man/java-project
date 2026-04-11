@@ -14,6 +14,7 @@
           <p>{{ user?.phone || '未设置手机号' }}</p>
           <p>{{ user?.email || '未设置邮箱' }}</p>
           <button class="btn-outline" @click="editUserInfo">编辑资料</button>
+          <button class="change-password-btn" @click="changePassword">修改密码</button>
         </div>
       </div>
       
@@ -93,65 +94,39 @@ const reviewCount = ref(0)
 const editUserInfo = () => {
   router.push('/user/edit')
 }
+// 修改密码
+const changePassword = () => {
+  router.push('/user/change-password')
+}
 
 // 获取统计数据
 const loadStatistics = async () => {
   try {
     console.log('开始加载统计数据')
-    
-    // 获取宠物数量
-    console.log('获取宠物列表...')
-    console.log('petStore:', petStore)
-    console.log('petStore.pets:', petStore.pets)
+
+    // 1. 获取宠物数量 (假设 getPetList 返回的是数组或者包含数组的对象)
     const petList = await petStore.getPetList()
-    console.log('petList:', petList)
-    console.log('petList.length:', petList.length)
-    petCount.value = petList.length
-    console.log('宠物数量:', petCount.value)
-    console.log('petStore.pets after getPetList:', petStore.pets)
-    
-    // 获取订单数量
-    console.log('获取订单列表...')
+    // 兼容处理：如果 getPetList 内部已经处理了 response.data，这里直接取长度
+    petCount.value = Array.isArray(petList) ? petList.length : 0
+
+    // 2. 获取订单数量
     const orderResponse = await axios.get('/order/orderInfo')
-    console.log('订单响应:', orderResponse)
-    // 适配不同的响应格式
-    if (orderResponse && (orderResponse.code === 200)) {
-      const orderData = orderResponse.data || orderResponse
-      if (Array.isArray(orderData)) {
-        orderCount.value = orderData.length
-      } else if (orderData && Array.isArray(orderData)) {
-        orderCount.value = orderData.length
-      } else {
-        console.error('订单响应格式错误:', orderResponse)
-      }
-      console.log('订单数量:', orderCount.value)
-    } else {
-      console.error('订单响应格式错误:', orderResponse)
+    // 修正：从 response.data 中获取业务数据
+    const orderResult = orderResponse.data
+    if (orderResult && orderResult.code === 200) {
+      const orderData = orderResult.data || []
+      orderCount.value = Array.isArray(orderData) ? orderData.length : 0
     }
-    
-    // 获取评价数量
-    console.log('获取评价列表...')
+
+    // 3. 获取评价数量
     const reviewResponse = await axios.get('/review/user/list')
-    console.log('评价响应:', reviewResponse)
-    // 适配不同的响应格式
-    if (reviewResponse && (reviewResponse.code === 200)) {
-      const reviewData = reviewResponse.data || reviewResponse
-      if (Array.isArray(reviewData)) {
-        reviewCount.value = reviewData.length
-      } else if (reviewData && Array.isArray(reviewData)) {
-        reviewCount.value = reviewData.length
-      } else {
-        console.error('评价响应格式错误:', reviewResponse)
-      }
-      console.log('评价数量:', reviewCount.value)
-    } else {
-      console.error('评价响应格式错误:', reviewResponse)
+    const reviewResult = reviewResponse.data
+    if (reviewResult && reviewResult.code === 200) {
+      const reviewData = reviewResult.data || []
+      reviewCount.value = Array.isArray(reviewData) ? reviewData.length : 0
     }
   } catch (error) {
     console.error('获取统计数据失败', error)
-    if (error.response) {
-      console.error('错误响应:', error.response)
-    }
   }
 }
 
@@ -167,6 +142,7 @@ onMounted(async () => {
 })
 </script>
 
+// ... existing code ...
 <style scoped>
 .user-center {
   min-height: 100vh;
@@ -215,6 +191,43 @@ onMounted(async () => {
 .user-info p {
   margin-bottom: var(--spacing-xs);
   color: var(--light-text-color);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.user-info button {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.change-password-btn {
+  background-color: transparent;
+  border: 1px solid var(--cta-color);
+  color: var(--cta-color);
+}
+
+.change-password-btn:hover {
+  background-color: var(--cta-color);
+  color: white;
 }
 
 .user-stats {
@@ -320,15 +333,16 @@ onMounted(async () => {
   .page-title {
     font-size: 1.5rem;
   }
-  
+
   .user-info-card {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .user-stats,
   .action-grid {
     grid-template-columns: 1fr;
   }
 }
 </style>
+

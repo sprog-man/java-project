@@ -47,15 +47,15 @@
           <ul class="contact-info">
             <li>
               <i class="icon location"></i>
-              <span>北京市朝阳区宠物大厦</span>
+              <span>广东石油化工学院</span>
             </li>
             <li>
               <i class="icon phone"></i>
-              <span>400-123-4567</span>
+              <span>400-123-7788</span>
             </li>
             <li>
               <i class="icon email"></i>
-              <span>service@petcompanion.com</span>
+              <span>2484511957@qq.com</span>
             </li>
           </ul>
         </div>

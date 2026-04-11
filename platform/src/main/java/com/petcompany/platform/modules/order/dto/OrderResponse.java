@@ -2,6 +2,7 @@ package com.petcompany.platform.modules.order.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -36,6 +37,12 @@ public class OrderResponse {
     private String providerName;
 
     /**
+     * ✅ 新增：下单用户的名称
+     */
+    private String userName;
+
+
+    /**
      * 服务时间
      */
     private String serviceTime;
@@ -58,7 +65,7 @@ public class OrderResponse {
     /**
      * 订单价格
      */
-    private Integer price;
+    private BigDecimal price;
 
     /**
      * 订单状态

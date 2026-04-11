@@ -4,131 +4,48 @@
     
     <div class="container">
       <h2 class="page-title">申请成为服务提供者</h2>
-      
+
       <form class="provider-apply-form" @submit.prevent="handleSubmit">
         <div class="form-section">
-          <h3>个人信息</h3>
-          
+          <h3>身份信息</h3>
+
           <div class="form-group">
-            <label for="name" class="form-label">姓名</label>
-            <input 
-              type="text" 
-              id="name" 
-              v-model="applyForm.name" 
-              class="form-input" 
-              placeholder="请输入姓名"
-              required
+            <label for="realName" class="form-label">真实姓名</label>
+            <input
+                type="text"
+                id="realName"
+                v-model="applyForm.realName"
+                class="form-input"
+                placeholder="请输入您的真实姓名"
+                required
             />
           </div>
-          
+
           <div class="form-group">
-            <label for="phone" class="form-label">联系电话</label>
-            <input 
-              type="tel" 
-              id="phone" 
-              v-model="applyForm.phone" 
-              class="form-input" 
-              placeholder="请输入联系电话"
-              required
+            <label for="idCard" class="form-label">身份证号</label>
+            <input
+                type="text"
+                id="idCard"
+                v-model="applyForm.idCard"
+                class="form-input"
+                placeholder="请输入18位身份证号"
+                required
             />
-          </div>
-          
-          <div class="form-group">
-            <label for="email" class="form-label">邮箱</label>
-            <input 
-              type="email" 
-              id="email" 
-              v-model="applyForm.email" 
-              class="form-input" 
-              placeholder="请输入邮箱"
-              required
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="avatar" class="form-label">个人照片</label>
-            <input 
-              type="file" 
-              id="avatar" 
-              class="form-input" 
-              accept="image/*"
-              @change="handleFileUpload"
-              required
-            />
-            <div v-if="applyForm.avatar" class="avatar-preview">
-              <img :src="applyForm.avatar" alt="个人照片预览" />
-            </div>
           </div>
         </div>
-        
+
         <div class="form-section">
-          <h3>服务信息</h3>
-          
+          <h3>服务经验</h3>
+
           <div class="form-group">
-            <label for="services" class="form-label">提供的服务</label>
-            <div class="service-checkboxes">
-              <label v-for="service in serviceTypes" :key="service.id" class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  :value="service.id" 
-                  v-model="applyForm.services"
-                />
-                {{ service.name }}
-              </label>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="experience" class="form-label">相关经验</label>
-            <textarea 
-              id="experience" 
-              v-model="applyForm.experience" 
-              class="form-input" 
-              placeholder="请描述您的宠物相关经验"
-              rows="4"
-              required
-            ></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label for="certificate" class="form-label">相关证书（可选）</label>
-            <input 
-              type="file" 
-              id="certificate" 
-              class="form-input" 
-              accept="image/*"
-              @change="handleCertificateUpload"
-            />
-            <div v-if="applyForm.certificate" class="certificate-preview">
-              <img :src="applyForm.certificate" alt="证书预览" />
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-section">
-          <h3>其他信息</h3>
-          
-          <div class="form-group">
-            <label for="address" class="form-label">服务区域</label>
-            <input 
-              type="text" 
-              id="address" 
-              v-model="applyForm.address" 
-              class="form-input" 
-              placeholder="请输入您能提供服务的区域"
-              required
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="availability" class="form-label">可用时间</label>
-            <textarea 
-              id="availability" 
-              v-model="applyForm.availability" 
-              class="form-input" 
-              placeholder="请描述您的可用时间，例如：周一至周五 9:00-18:00"
-              rows="4"
-              required
+            <label for="experience" class="form-label">相关经验描述</label>
+            <textarea
+                id="experience"
+                v-model="applyForm.experience"
+                class="form-input"
+                placeholder="请描述您照顾宠物的经验（例如：养猫5年，擅长处理猫咪应激反应...）"
+                rows="6"
+                required
             ></textarea>
           </div>
         </div>
@@ -147,8 +64,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup>import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
@@ -157,57 +73,35 @@ import { useProviderStore } from '../../store/provider'
 const router = useRouter()
 const providerStore = useProviderStore()
 
-// 服务类型列表
-const serviceTypes = ref([
-  { id: 1, name: '宠物陪伴' },
-  { id: 2, name: '宠物喂食' },
-  { id: 3, name: '宠物遛弯' },
-  { id: 4, name: '宠物清洁' }
-])
 
-// 申请表单
+
+// ✅ 修改：申请表单字段与后端 DTO 完全对齐
 const applyForm = ref({
-  name: '',
-  phone: '',
-  email: '',
-  avatar: '',
-  services: [],
-  experience: '',
-  certificate: '',
-  address: '',
-  availability: ''
+  realName: '',
+  idCard: '',
+  experience: ''
 })
 
 // 加载状态
 const isLoading = ref(false)
 
-// 处理文件上传
-const handleFileUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    // 这里应该上传文件到服务器，暂时使用模拟的图片URL
-    applyForm.value.avatar = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=person%20avatar%2C%20simple%20style&image_size=square'
-  }
-}
 
-// 处理证书上传
-const handleCertificateUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    // 这里应该上传文件到服务器，暂时使用模拟的图片URL
-    applyForm.value.certificate = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=certificate%20document%2C%20simple%20style&image_size=square'
-  }
-}
 
 // 处理表单提交
 const handleSubmit = async () => {
+  if (!applyForm.value.realName || !applyForm.value.idCard || !applyForm.value.experience) {
+    alert('请填写完整所有必填项')
+    return
+  }
+
   isLoading.value = true
   try {
     await providerStore.applyProvider(applyForm.value)
-    // 提交成功后跳转到成功页面
+    // 提交成功后跳转到首页或提示页
     router.push('/')
   } catch (error) {
     console.error('提交申请失败', error)
+    alert(error.response?.data?.msg || '申请提交失败，请稍后重试')
   } finally {
     isLoading.value = false
   }

@@ -31,7 +31,11 @@ public class ServiceProviderController {
     @PostMapping("/apply")
     public Result<ServiceProvider> applyServiceProvider(@Valid @RequestBody ServiceProviderApplyRequest request) {
         Long userId = UserContext.getCurrentUserId();
-        log.info("用户{}申请成为服务提供者", userId);
+        log.info("Controller 获取到的 userId: {}", userId); // ✅ 看这里打印的是不是 null
+
+        if (userId == null) {
+            return Result.fail("请先登录");
+        }
 
         ServiceProvider serviceProvider = serviceProviderService.applyServiceProvider(userId, request);
         return Result.success(serviceProvider);
@@ -116,6 +120,19 @@ public class ServiceProviderController {
 
         List<OrderResponse> list = serviceProviderService.getProviderOrderList(userId);
         return Result.success(list);
+    }
+
+    /**
+     * 统计已完成订单数
+     */
+    @GetMapping("/stats/completed-orders")
+    @RequiresPermission(userTypes = {1})
+    public Result<Long> countCompletedOrders() {
+        Long userId = UserContext.getCurrentUserId();
+        log.info("统计服务提供者{}的已完成订单数", userId);
+
+        Long count = serviceProviderService.countCompletedOrders(userId);
+        return Result.success(count);
     }
 
 }

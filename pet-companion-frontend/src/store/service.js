@@ -15,26 +15,37 @@ export const useServiceStore = defineStore('service', {
     getProviders: (state) => state.providers,
     getCurrentProvider: (state) => state.currentProvider
   },
-  
+
   actions: {
-    // 获取服务类型列表
-    async getServiceTypeList() {
+    // ✅ 新增：获取服务类型列表（对接后端接口）
+    async fetchServiceTypes() {
       try {
-        const response = await axios.get('/api/service/type')
-        this.serviceTypes = response.data
-        return response.data
+        const response = await axios.get('/service-type/list')
+        if (response.data.code === 200) {
+          this.serviceTypes = response.data.data
+        }
       } catch (error) {
+        console.error('获取服务类型列表失败:', error)
         throw error
       }
     },
-    
-    // 获取服务类型详情
-    async getServiceTypeDetail(id) {
+
+    // ✅ 完善：获取服务类型详情
+    async fetchServiceTypeDetail(id) {
       try {
-        const response = await axios.get(`/api/service/type/${id}`)
-        this.currentServiceType = response.data
-        return response.data
+        console.log('Store: 正在请求服务详情, ID:', id); // 调试日志
+        const response = await axios.get(`/service-type/${id}`)
+        console.log('Store: 后端原始响应:', response.data); // 调试日志
+
+        if (response.data.code === 200) {
+          this.currentServiceType = response.data.data
+          console.log('Store: 成功更新 currentServiceType:', this.currentServiceType);
+          return response.data.data
+        } else {
+          console.error('Store: 业务逻辑错误:', response.data.msg);
+        }
       } catch (error) {
+        console.error('获取服务类型详情失败:', error)
         throw error
       }
     },

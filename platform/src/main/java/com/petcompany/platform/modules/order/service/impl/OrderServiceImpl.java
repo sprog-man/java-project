@@ -2,6 +2,7 @@ package com.petcompany.platform.modules.order.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.common.exception.BusinessException;
 import com.petcompany.platform.common.service.AsyncService;
 import com.petcompany.platform.modules.order.dto.OrderCreateRequest;
@@ -13,11 +14,18 @@ import com.petcompany.platform.modules.pet.entity.Pet;
 import com.petcompany.platform.modules.pet.service.PetService;
 import com.petcompany.platform.modules.service.entity.ServiceType;
 import com.petcompany.platform.modules.service.service.ServiceTypeService;
+import com.petcompany.platform.modules.user.entity.User;
+import com.petcompany.platform.modules.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,11 +48,30 @@ public class OrderServiceImpl implements OrderService {
 
     @Resource
     private AsyncService asyncService;
+    @Resource
+    private UserService userService;
 
+
+    /*
+    * 获取用户订单信息
+    * */
     @Override
     public List<OrderResponse> getOrderList() {
         // 查询用户订单列表
         LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Order::getDeleted, 0);
+        wrapper.orderByDesc(Order::getCreateTime);
+
+        List<Order> orders = orderMapper.selectList(wrapper);
+        return orders.stream().map(this::convertToResponse).collect(Collectors.toList());
+    }
+
+
+    @Override
+    // ✅ 2. 新增：根据用户 ID 获取订单列表的方法
+    public List<OrderResponse> getOrderListByUserId(Long userId) {
+        LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Order::getUserId, userId);
         wrapper.eq(Order::getDeleted, 0);
         wrapper.orderByDesc(Order::getCreateTime);
 
@@ -68,6 +95,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
+        // ✅ 1. 从安全上下文中获取当前登录用户的 ID
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long currentUserId = (Long) authentication.getPrincipal();
+
         // 验证宠物是否存在
         Pet pet = petService.getPetById(request.getPetId());
         if (pet == null) {
@@ -80,38 +114,61 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("服务类型不存在");
         }
 
-        // 解析服务时间
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime serviceStartTime = LocalDateTime.parse(request.getServiceDate() + " " + request.getServiceStartTime(), formatter);
-        LocalDateTime serviceEndTime = LocalDateTime.parse(request.getServiceDate() + " " + request.getServiceEndTime(), formatter);
+        try {
+            // ✅ 2. 补全：日期和时间解析逻辑
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        // 创建订单
-        Order order = new Order();
-        order.setUserId(1L); // 暂时硬编码用户ID，后续从上下文获取
-        order.setPetId(request.getPetId());
-        order.setServiceTypeId(request.getServiceType());
-        order.setServiceStartTime(serviceStartTime);
-        order.setServiceEndTime(serviceEndTime);
-        order.setAddress(request.getAddress());
-        order.setPhone(request.getPhone());
-        order.setNotes(request.getNotes());
-        order.setPrice(request.getPrice().doubleValue());
-        order.setStatus(1); // 待支付
-        order.setPayStatus(0); // 未支付
-        order.setOrderNo(generateOrderNo());
-        order.setCreateTime(LocalDateTime.now());
-        order.setUpdateTime(LocalDateTime.now());
-        order.setDeleted(0);
+            LocalDate date = LocalDate.parse(request.getServiceDate(), dateFormatter);
+            LocalTime startTime = LocalTime.parse(request.getServiceStartTime(), timeFormatter);
+            LocalTime endTime = LocalTime.parse(request.getServiceEndTime(), timeFormatter);
 
-        // 保存订单
-        orderMapper.insert(order);
-        log.info("创建订单{}，金额：{}", order.getOrderNo(), request.getPrice());
+            LocalDateTime serviceStart = LocalDateTime.of(date, startTime);
+            LocalDateTime serviceEnd = LocalDateTime.of(date, endTime);
 
-        // 异步处理订单相关的耗时操作
-        asyncService.processOrder(order.getId(), 1L);
-        asyncService.sendNotification(1L, "您的订单" + order.getOrderNo() + "已创建成功");
+            // 处理跨天逻辑（如果结束时间小于开始时间，视为第二天）
+            if (serviceEnd.isBefore(serviceStart)) {
+                serviceEnd = serviceEnd.plusDays(1);
+            }
 
-        return convertToResponse(order);
+            // 创建订单
+            Order order = new Order();
+            order.setUserId(currentUserId); // ✅ 3. 使用真实的用户 ID
+            order.setPetId(request.getPetId());
+            order.setServiceTypeId(request.getServiceType());
+            order.setServiceStartTime(serviceStart);
+            order.setServiceEndTime(serviceEnd);
+            order.setAddress(request.getAddress());
+            order.setPhone(request.getPhone());
+            order.setNotes(request.getNotes());
+
+            // ✅ 4. 价格处理
+            if (request.getPrice() != null) {
+                order.setPrice(request.getPrice().doubleValue());
+            } else {
+                throw new BusinessException("订单价格不能为空");
+            }
+
+            order.setStatus(2); // 2-待接单
+            order.setPayStatus(0);
+            order.setOrderNo(generateOrderNo());
+            order.setCreateTime(LocalDateTime.now());
+            order.setUpdateTime(LocalDateTime.now());
+            order.setDeleted(0);
+
+            // 保存订单
+            orderMapper.insert(order);
+            log.info("用户 {} 创建订单 {}，金额：{}", currentUserId, order.getOrderNo(), request.getPrice());
+
+            // 异步处理
+            asyncService.processOrder(order.getId(), currentUserId);
+            asyncService.sendNotification(currentUserId, "您的订单" + order.getOrderNo() + "已创建成功");
+
+            return convertToResponse(order);
+        } catch (Exception e) {
+            log.error("创建订单发生严重错误", e);
+            throw new BusinessException("创建订单失败: " + e.getMessage());
+        }
     }
 
     @Override
@@ -215,6 +272,7 @@ public class OrderServiceImpl implements OrderService {
         return orders.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
+
     @Override
     public List<OrderResponse> getPendingOrderList() {
         // 查询待接单的订单列表
@@ -244,9 +302,31 @@ public class OrderServiceImpl implements OrderService {
         response.setAddress(order.getAddress());
         response.setPhone(order.getPhone());
         response.setNotes(order.getNotes());
-        response.setPrice(order.getPrice().intValue());
+        // ✅ 修改：直接设置 Double 或转换为 BigDecimal，不要调用 .intValue()
+        if (order.getPrice() != null) {
+            response.setPrice(java.math.BigDecimal.valueOf(order.getPrice()));
+        }
         response.setCreateTime(order.getCreateTime());
         response.setReviewed(false);
+
+
+        // ✅ 2. 获取并设置用户名（下单用户）
+        if (order.getUserId() != null) {
+            User user = userService.getUserById(order.getUserId());
+            if (user != null) {
+                response.setUserName(user.getUsername() != null ? user.getUsername() : user.getUsername());
+                // 注意：OrderResponse 里目前没有 userName 字段，我们可以暂时复用 providerName 或者你在 DTO 里加一个 userName 字段
+                // 建议：在 OrderResponse.java 中增加 private String userName;
+            }
+        }
+
+        // ✅ 3. 如果有服务提供者，也可以顺便查出服务者的名字
+        if (order.getProviderId() != null) {
+            User provider = userService.getUserById(order.getProviderId());
+            if (provider != null) {
+                response.setProviderName(provider.getUsername() != null ? provider.getUsername() : provider.getUsername());
+            }
+        }
 
         // 获取宠物信息
         Pet pet = petService.getPetById(order.getPetId());
@@ -313,5 +393,48 @@ public class OrderServiceImpl implements OrderService {
 
         return response;
     }
+    @Override
+    public Long countByProviderIdAndStatus(Long providerId, Integer status) {
+        LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Order::getProviderId, providerId)
+                .eq(Order::getStatus, status);
+        return orderMapper.selectCount(wrapper);
+    }
 
+
+    /*
+    * 管理员获取订单列表
+    * */
+    @Override
+    public Page<OrderResponse> getAdminOrderPage(int page, int size, Integer status, String keyword) {
+        Page<Order> mpPage = new Page<>(page, size);
+        LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+
+        // 1. 筛选状态
+        if (status != null) {
+            wrapper.eq(Order::getStatus, status);
+        }
+
+        // 2. 关键词搜索（搜索订单号或手机号）
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(Order::getOrderNo, keyword)
+                    .or()
+                    .like(Order::getPhone, keyword));
+        }
+
+        wrapper.eq(Order::getDeleted, 0);
+        wrapper.orderByDesc(Order::getCreateTime);
+
+        // 执行分页查询
+        Page<Order> orderPage = orderMapper.selectPage(mpPage, wrapper);
+
+        // 转换为 DTO 分页对象
+        Page<OrderResponse> responsePage = new Page<>();
+        responsePage.setCurrent(orderPage.getCurrent());
+        responsePage.setSize(orderPage.getSize());
+        responsePage.setTotal(orderPage.getTotal());
+        responsePage.setRecords(orderPage.getRecords().stream().map(this::convertToResponse).collect(Collectors.toList()));
+
+        return responsePage;
+    }
 }

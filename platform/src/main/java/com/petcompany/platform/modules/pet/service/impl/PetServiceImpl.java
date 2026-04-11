@@ -1,7 +1,10 @@
 package com.petcompany.platform.modules.pet.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.common.exception.BusinessException;
 import com.petcompany.platform.modules.pet.dto.PetCreateRequest;
 import com.petcompany.platform.modules.pet.dto.PetResponse;
@@ -9,6 +12,8 @@ import com.petcompany.platform.modules.pet.dto.PetUpdateRequest;
 import com.petcompany.platform.modules.pet.entity.Pet;
 import com.petcompany.platform.modules.pet.service.PetService;
 import com.petcompany.platform.modules.pet.mapper.PetMapper;
+import com.petcompany.platform.modules.user.entity.User;
+import com.petcompany.platform.modules.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -27,6 +32,9 @@ public class PetServiceImpl implements PetService {
 
     @Resource
     private PetMapper petMapper;
+
+    @Resource
+    private UserService userService;
 
     @Override
     public Pet createPet(Long userId, PetCreateRequest request) {
@@ -121,6 +129,43 @@ public class PetServiceImpl implements PetService {
         }
 
         return response;
+    }
+
+    /*
+    * 管理员端分页查询宠物
+    * */
+    @Override
+    public Page<PetResponse> getAdminPetPage(int page, int size, String keyword) {
+        // 1. 创建分页对象
+        Page<Pet> petPage = new Page<>(page, size);
+
+        //2.构建查询条件
+        LambdaQueryWrapper<Pet> wrapper = Wrappers.lambdaQuery();
+        if (StringUtils.isNotBlank( keyword)){
+            // 简单起见，先按宠物名称模糊搜索
+            // 如果要按主人名称搜索，通常需要连表查询或先查用户ID
+            wrapper.like(Pet::getName, keyword);
+        }
+        wrapper.eq(Pet::getDeleted, 0);
+
+        // 3. 执行分页查询
+        IPage<Pet> result = petMapper.selectPage(petPage, wrapper);
+
+        //4.转换为DTO并填充主人信息
+        Page<PetResponse> responsePage = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
+        List<PetResponse> responseList = result.getRecords().stream().map(pet -> {
+            PetResponse response = convertToResponse(pet);
+            // ✅ 关联查询主人名称
+            if (pet.getUserId() != null) {
+                User user = userService.getUserById(pet.getUserId());
+                if (user != null) {
+                    response.setOwnerName(user.getUsername() != null ? user.getUsername() : user.getUsername());
+                }
+            }
+            return response;
+        }).collect(Collectors.toList());
+        responsePage.setRecords(responseList);
+        return responsePage;
     }
 
 }

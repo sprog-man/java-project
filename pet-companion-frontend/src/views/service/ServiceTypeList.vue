@@ -9,12 +9,13 @@
       <div class="service-type-grid">
         <div class="service-type-card" v-for="service in serviceTypes" :key="service.id">
           <div class="service-type-icon">
-            <img :src="service.icon" :alt="service.name" />
+            <!-- 暂时使用默认图标，如果后端返回 icon 字段会自动切换 -->
+            <span style="font-size: 40px;">🐾</span>
           </div>
           <h3>{{ service.name }}</h3>
           <p>{{ service.description }}</p>
           <div class="service-type-price">
-            <span class="price">¥{{ service.price }}/小时</span>
+            <span class="price">¥{{ Number(service.price).toFixed(2) }}/小时</span>
           </div>
           <router-link :to="`/service/type/${service.id}`" class="btn-primary">了解详情</router-link>
         </div>
@@ -25,49 +26,23 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted, computed } from 'vue'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
 import { useServiceStore } from '../../store/service'
 
 const serviceStore = useServiceStore()
-const serviceTypes = ref([])
+
+// ✅ 使用 computed 关联到 store 中的数据
+const serviceTypes = computed(() => serviceStore.serviceTypes || [])
+
 
 onMounted(async () => {
   try {
-    // 这里应该从后端获取服务类型列表
-    // 暂时使用模拟数据
-    serviceTypes.value = [
-      {
-        id: 1,
-        name: '宠物陪伴',
-        description: '专业的宠物陪伴服务，让您的爱宠不再孤单',
-        price: 50,
-        icon: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=pet%20companion%20icon%2C%20friendly%20style%2C%20simple%20design&image_size=square'
-      },
-      {
-        id: 2,
-        name: '宠物喂食',
-        description: '定时定量为您的爱宠提供营养均衡的饮食',
-        price: 30,
-        icon: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=pet%20feeding%20icon%2C%20friendly%20style%2C%20simple%20design&image_size=square'
-      },
-      {
-        id: 3,
-        name: '宠物遛弯',
-        description: '专业的宠物遛弯服务，让您的爱宠保持健康活力',
-        price: 40,
-        icon: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=pet%20walking%20icon%2C%20friendly%20style%2C%20simple%20design&image_size=square'
-      },
-      {
-        id: 4,
-        name: '宠物清洁',
-        description: '专业的宠物清洁服务，让您的爱宠保持干净整洁',
-        price: 60,
-        icon: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=pet%20grooming%20icon%2C%20friendly%20style%2C%20simple%20design&image_size=square'
-      }
-    ]
+    // 如果 store 里已经有数据，可以跳过请求，提高加载速度
+    if (serviceTypes.value.length === 0) {
+      await serviceStore.fetchServiceTypes()
+    }
   } catch (error) {
     console.error('获取服务类型列表失败', error)
   }

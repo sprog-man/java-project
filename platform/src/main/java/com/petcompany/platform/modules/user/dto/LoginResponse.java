@@ -59,6 +59,11 @@ public class LoginResponse {
          */
         private Integer verified;
 
+        /**
+         * 邮箱
+         */
+        private String email;
+
     }
 
 }

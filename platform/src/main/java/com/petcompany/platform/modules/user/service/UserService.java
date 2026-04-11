@@ -1,10 +1,7 @@
 package com.petcompany.platform.modules.user.service;
 
-import com.petcompany.platform.modules.user.dto.AdminLoginRequest;
-import com.petcompany.platform.modules.user.dto.AdminLoginResponse;
-import com.petcompany.platform.modules.user.dto.LoginRequest;
-import com.petcompany.platform.modules.user.dto.LoginResponse;
-import com.petcompany.platform.modules.user.dto.RegisterRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.petcompany.platform.modules.user.dto.*;
 import com.petcompany.platform.modules.user.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,11 +45,12 @@ public interface UserService {
     /**
      * 更新用户信息
      */
-    void updateUser(User user);
+    void updateUser(Long userId, UpdateProfileRequest request);
 
     /**
      * 修改密码
      */
+
     void changePassword(Long userId, String oldPassword, String newPassword);
 
     /**
@@ -63,4 +61,24 @@ public interface UserService {
      * 获取当前用户信息
      */
     Map<String, Object> getCurrentUserInfo();
+    /**
+     * 获取管理员统计信息
+     */
+    AdminStatsResponse getAdminStats();
+
+    /**
+     * 分页获取用户列表
+     */
+    // UserService.java
+    Page<User> getUserList(int pageNum, int pageSize, String keyword, Integer userType, Integer status, Integer verified, Integer role);
+
+    /**
+     * 管理员更新用户状态
+     */
+    void updateUserStatusByAdmin(Long userId, Integer status, Integer verified, Integer role);
+
+    /**
+     * 管理员逻辑删除用户
+     */
+    void deleteUserByAdmin(Long userId);
 }

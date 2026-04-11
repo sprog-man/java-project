@@ -4,15 +4,34 @@ import axios from '../api/axios'
 export const usePetStore = defineStore('pet', {
   state: () => ({
     pets: [],
+    myPets: [], // ✅ 1. 增加 myPets 状态，方便语义化区分
     currentPet: null
   }),
-  
+
   getters: {
     getPets: (state) => state.pets,
+    getMyPets: (state) => state.myPets, // ✅ 2. 增加对应的 getter
     getCurrentPet: (state) => state.currentPet
   },
-  
+
   actions: {
+    // ✅ 3. 增加 fetchMyPets 方法（对应 CreateOrder.vue 的调用）
+    async fetchMyPets() {
+      try {
+        const response = await axios.get('/pet/list')
+        if (response.data && response.data.code === 200) {
+          this.myPets = response.data.data
+          this.pets = response.data.data // 同步更新旧的状态，防止其他地方报错
+          return response.data.data
+        } else {
+          console.error('获取宠物列表失败:', response.data)
+          throw new Error(response.data.message || '获取宠物列表失败')
+        }
+      } catch (error) {
+        console.error('获取宠物列表失败:', error)
+        throw error
+      }
+    },
     // 获取宠物列表
     async getPetList() {
       try {
@@ -98,5 +117,5 @@ export const usePetStore = defineStore('pet', {
         throw error
       }
     }
-  }
-})
+     }
+  })

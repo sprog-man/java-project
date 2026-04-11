@@ -23,17 +23,21 @@ public class OrderController {
     private OrderService orderService;
 
     /**
-     * 获取订单列表
+     * ✅ 1. 获取当前用户的订单列表 (原 /orderInfo)
+     * GET /order
      */
-    @GetMapping("/orderInfo")
+    @GetMapping
     public Result<List<OrderResponse>> getOrderList() {
-        log.info("接收到获取订单列表请求");
-        List<OrderResponse> orders = orderService.getOrderList();
+        // TODO: 后续从 SecurityContext 获取真实 userId，目前暂时查所有或硬编码
+        Long currentUserId = 1L;
+        log.info("接收到获取用户 {} 的订单列表请求", currentUserId);
+        List<OrderResponse> orders = orderService.getOrderListByUserId(currentUserId);
         return Result.success("获取订单列表成功", orders);
     }
 
     /**
-     * 获取订单详情
+     * ✅ 2. 获取订单详情
+     * GET /order/{id}
      */
     @GetMapping("/{id}")
     public Result<OrderResponse> getOrderDetail(@PathVariable Long id) {
@@ -42,19 +46,22 @@ public class OrderController {
         return Result.success("获取订单详情成功", order);
     }
 
+
     /**
-     * 创建订单
+     * ✅ 3. 创建订单
+     * POST /order
      */
-    @PostMapping("/create")
+    @PostMapping
     public Result<OrderResponse> createOrder(@Valid @RequestBody OrderCreateRequest request) {
-        log.info("接收到创建订单请求: serviceType={}, serviceTime={}", request.getServiceType(), request.getServiceTime());
+        log.info("接收到创建订单请求: serviceType={}, petId={}", request.getServiceType(), request.getPetId());
         OrderResponse order = orderService.createOrder(request);
         log.info("创建订单成功: orderId={}", order.getId());
         return Result.success("创建订单成功", order);
     }
 
     /**
-     * 取消订单
+     * ✅ 4. 取消订单
+     * PUT /order/{id}/cancel
      */
     @PutMapping("/{id}/cancel")
     public Result<OrderResponse> cancelOrder(@PathVariable Long id) {
@@ -65,40 +72,41 @@ public class OrderController {
     }
 
     /**
-     * 接受订单
+     * ✅ 5. 接受订单 (服务者端)
+     * PUT /order/{id}/accept
      */
     @PutMapping("/{id}/accept")
     public Result<OrderResponse> acceptOrder(@PathVariable Long id) {
         log.info("接收到接受订单请求: id={}", id);
         OrderResponse order = orderService.acceptOrder(id);
-        log.info("接受订单成功: orderId={}", order.getId());
         return Result.success("接受订单成功", order);
     }
 
     /**
-     * 开始服务
+     * ✅ 6. 开始服务
+     * PUT /order/{id}/start
      */
     @PutMapping("/{id}/start")
     public Result<OrderResponse> startOrder(@PathVariable Long id) {
         log.info("接收到开始服务请求: id={}", id);
         OrderResponse order = orderService.startOrder(id);
-        log.info("开始服务成功: orderId={}", order.getId());
         return Result.success("开始服务成功", order);
     }
 
     /**
-     * 完成服务
+     * ✅ 7. 完成服务
+     * PUT /order/{id}/complete
      */
     @PutMapping("/{id}/complete")
     public Result<OrderResponse> completeOrder(@PathVariable Long id) {
         log.info("接收到完成服务请求: id={}", id);
         OrderResponse order = orderService.completeOrder(id);
-        log.info("完成服务成功: orderId={}", order.getId());
         return Result.success("完成服务成功", order);
     }
 
     /**
-     * 获取服务提供者订单列表
+     * ✅ 8. 获取服务提供者订单列表
+     * GET /order/provider
      */
     @GetMapping("/provider")
     public Result<List<OrderResponse>> getProviderOrderList() {
@@ -108,7 +116,8 @@ public class OrderController {
     }
 
     /**
-     * 获取待接单订单列表
+     * ✅ 9. 获取待接单订单列表
+     * GET /order/pending
      */
     @GetMapping("/pending")
     public Result<List<OrderResponse>> getPendingOrderList() {

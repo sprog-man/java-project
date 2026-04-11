@@ -12,6 +12,7 @@
           <div class="hero-buttons">
             <router-link to="/order/create" class="btn-primary">立即预约</router-link>
             <router-link to="/service/type" class="btn-outline">了解服务</router-link>
+            <button @click="handleProviderPage" class="btn-outline">服务者页面</button>
           </div>
         </div>
         <div class="hero-image">
@@ -100,8 +101,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
+import { useUserStore } from '../../store/user'
 
 // 服务类型数据
 const services = ref([
@@ -192,6 +195,36 @@ const reviews = ref([
     serviceName: '宠物陪伴'
   }
 ])
+
+const router = useRouter()
+const userStore = useUserStore()
+
+// 处理服务者页面按钮点击
+const handleProviderPage = async () => {
+  // 检查用户是否登录
+  if (!userStore.getIsLoggedIn) {
+    router.push('/login')
+    return
+  }
+  
+  // 获取用户信息
+  try {
+    await userStore.getUserInfo()
+    const user = userStore.getUser
+    
+    // 检查用户是否已认证
+    if (user.verified === 1) {
+      router.push('/server/dashboard')
+    } else {
+      alert('您需要先完成认证才能访问服务者页面')
+      router.push('/provider/apply')
+    }
+  } catch (error) {
+    console.error('获取用户信息失败', error)
+    alert('获取用户信息失败，请重新登录')
+    router.push('/login')
+  }
+}
 
 // 页面加载时的处理
 onMounted(() => {

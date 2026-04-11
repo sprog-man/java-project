@@ -70,4 +70,9 @@ public class PetResponse {
      */
     private LocalDateTime createTime;
 
+    /**
+     * 主人名称（非数据库字段，用于展示）
+     */
+    private String ownerName;
+
 }

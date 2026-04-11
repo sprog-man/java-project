@@ -18,6 +18,13 @@ public class UserContext {
         }
 
         Object principal = authentication.getPrincipal();
+
+        // ✅ 修复：兼容 Long 类型的 principal
+        if (principal instanceof Long) {
+            return (Long) principal;
+        }
+
+        // 兼容 CustomUserDetails 类型（如果以后需要）
         if (principal instanceof CustomUserDetails) {
             return ((CustomUserDetails) principal).getUserId();
         }

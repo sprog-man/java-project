@@ -22,7 +22,7 @@
         </div>
         
         <div class="order-actions">
-          <router-link :to="`/admin/orders/${order.id}`" class="btn-outline">查看详情</router-link>
+          <router-link :to="`/provider/orders/${order.id}`" class="btn-outline">查看详情</router-link>
           <button class="btn-primary" @click="processOrder(order.id)">处理订单</button>
         </div>
       </div>
@@ -38,9 +38,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
 import { useOrderStore } from '../../store/order'
+
+const router = useRouter()
 
 const orderStore = useOrderStore()
 const orders = ref([])
@@ -48,7 +51,7 @@ const orders = ref([])
 // 处理订单
 const processOrder = (id) => {
   // 跳转到订单详情页面进行处理
-  console.log('处理订单:', id)
+  router.push(`/provider/orders/${id}`)
 }
 
 onMounted(async () => {

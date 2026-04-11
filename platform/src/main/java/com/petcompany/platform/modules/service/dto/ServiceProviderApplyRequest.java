@@ -27,4 +27,7 @@ public class ServiceProviderApplyRequest {
     @NotBlank(message = "服务经验不能为空")
     private String experience;
 
+
+    private Double latitude; // 纬度
+    private Double longitude; //
 }

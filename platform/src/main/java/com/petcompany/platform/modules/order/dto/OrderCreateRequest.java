@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 订单创建请求
  */
@@ -66,6 +68,6 @@ public class OrderCreateRequest {
      * 订单价格
      */
     @NotNull(message = "订单价格不能为空")
-    private Integer price;
+    private BigDecimal price; // ✅ 修改为 BigDecimal 以支持小数金额
 
 }

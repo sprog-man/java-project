@@ -1,31 +1,40 @@
 <template>
   <div class="service-type-detail">
     <Header />
-    
+
     <div class="container">
-      <div class="service-type-info">
+      <!-- 增加一个加载判断，防止数据没回来时页面空白 -->
+      <div v-if="serviceType.id" class="service-type-info">
         <div class="service-type-header">
           <div class="service-type-icon">
-            <img :src="serviceType.icon" :alt="serviceType.name" />
+            <!-- 如果后端有 icon 字段就用后端的，没有就显示默认图标 -->
+            <span style="font-size: 50px;">🐾</span>
           </div>
           <div class="service-type-title">
             <h2>{{ serviceType.name }}</h2>
-            <div class="service-type-price">¥{{ serviceType.price }}/小时</div>
+            <div class="service-type-price">¥{{ Number(serviceType.price).toFixed(2) }}/小时</div>
           </div>
         </div>
-        
+
         <div class="service-type-description">
           <h3>服务介绍</h3>
           <p>{{ serviceType.description }}</p>
+
+          <!-- 暂时注释掉 features，因为数据库表里没有这个字段 -->
+          <!--
           <ul class="service-type-features">
             <li v-for="feature in serviceType.features" :key="feature">{{ feature }}</li>
           </ul>
+          -->
         </div>
-        
+
         <div class="service-type-actions">
           <router-link to="/order/create" class="btn-primary">立即预约</router-link>
           <router-link to="/service/type" class="btn-outline">返回列表</router-link>
         </div>
+      </div>
+      <div v-else class="loading-state">
+        <p>正在加载服务详情...</p>
       </div>
     </div>
     
@@ -33,8 +42,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
@@ -42,38 +50,34 @@ import { useServiceStore } from '../../store/service'
 
 const route = useRoute()
 const serviceStore = useServiceStore()
-const serviceType = ref({
-  id: '',
-  name: '',
-  description: '',
-  price: 0,
-  features: [],
-  icon: ''
+
+// ✅ 使用 computed 关联到 store 中的当前服务类型
+const serviceType = computed(() => serviceStore.currentServiceType || {})
+
+// ✅ 定义一个加载函数
+const loadDetail = async (id) => {
+  if (!id) {
+    console.warn('详情页: ID 为空，无法加载');
+    return
+  }
+  console.log('详情页: 准备加载 ID =', id);
+  try {
+    await serviceStore.fetchServiceTypeDetail(id)
+  } catch (error) {
+    console.error('详情页: 加载异常', error)
+  }
+}
+
+onMounted(() => {
+  // 页面挂载时加载数据
+  loadDetail(route.params.id)
 })
 
-onMounted(async () => {
-  const id = route.params.id
-  try {
-    // 这里应该从后端获取服务类型详情
-    // 暂时使用模拟数据
-    serviceType.value = {
-      id: id,
-      name: '宠物陪伴',
-      description: '专业的宠物陪伴服务，让您的爱宠不再孤单。我们的服务提供者经过专业培训，能够为您的爱宠提供贴心的照顾和陪伴，包括玩耍、互动、安抚等。',
-      price: 50,
-      features: [
-        '专业的宠物陪伴服务',
-        '经过培训的服务提供者',
-        '贴心的照顾和陪伴',
-        '定期反馈宠物状态',
-        '灵活的服务时间'
-      ],
-      icon: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=pet%20companion%20icon%2C%20friendly%20style%2C%20simple%20design&image_size=square'
-    }
-  } catch (error) {
-    console.error('获取服务类型详情失败', error)
-  }
+// ✅ 监听路由参数变化（防止从 A 服务直接跳到 B 服务时数据不更新）
+watch(() => route.params.id, (newId) => {
+  if (newId) loadDetail(newId)
 })
+
 </script>
 
 <style scoped>

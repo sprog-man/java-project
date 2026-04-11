@@ -1,14 +1,18 @@
 package com.petcompany.platform.modules.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.common.exception.BusinessException;
 import com.petcompany.platform.infrastructure.security.JwtService;
-import com.petcompany.platform.modules.user.dto.AdminLoginRequest;
-import com.petcompany.platform.modules.user.dto.AdminLoginResponse;
-import com.petcompany.platform.modules.user.dto.LoginRequest;
-import com.petcompany.platform.modules.user.dto.LoginResponse;
-import com.petcompany.platform.modules.user.dto.RegisterRequest;
+import com.petcompany.platform.modules.order.entity.Order;
+import com.petcompany.platform.modules.order.mapper.OrderMapper;
+import com.petcompany.platform.modules.review.entity.Review;
+import com.petcompany.platform.modules.review.mapper.ReviewMapper;
+import com.petcompany.platform.modules.service.entity.ServiceType;
+import com.petcompany.platform.modules.service.mapper.ServiceTypeMapper;
+import com.petcompany.platform.modules.user.dto.*;
 import com.petcompany.platform.modules.user.entity.User;
 import com.petcompany.platform.modules.user.service.UserService;
 import com.petcompany.platform.modules.user.mapper.UserMapper;
@@ -39,6 +43,12 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private ServiceTypeMapper serviceTypeMapper;
+    @Resource
+    private OrderMapper orderMapper;
+    @Resource
+    private ReviewMapper reviewMapper;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -133,6 +143,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setAvatar(user.getAvatar());
         userInfo.setUserType(user.getUserType());
         userInfo.setVerified(user.getVerified());
+        userInfo.setEmail(user.getEmail());
 
         response.setUserInfo(userInfo);
         /*return到哪里去？涉及到mvc机制，谁请求到UserController对应的路径调用该方法，就返回给谁*/
@@ -204,8 +215,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(User user) {
-        user.setUpdateTime(LocalDateTime.now());
+    public void updateUser(Long userId, UpdateProfileRequest request) {
+        // 1. 根据 ID 查询数据库中的现有用户
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        // 2. 选择性更新（只更新 DTO 中不为 null 的字段）
+        // 原理：如果前端没传某个字段，我们就不覆盖数据库里的旧值
+        if (request.getNickname() != null){
+            user.setNickname(request.getNickname());
+        }
+        if (request.getEmail() != null){
+            user.setEmail(request.getEmail());
+        }
+        if (request.getAvatar() != null){
+            user.setAvatar(request.getAvatar());
+        }
+        // 3. 执行更新
         userMapper.updateById(user);
     }
 
@@ -223,8 +250,8 @@ public class UserServiceImpl implements UserService {
 
         // 更新密码
         user.setPassword(passwordEncoder.encode(newPassword));
-        user.setUpdateTime(LocalDateTime.now());
         userMapper.updateById(user);
+
     }
 
     @Override
@@ -306,4 +333,107 @@ public class UserServiceImpl implements UserService {
 
         return userInfo;
     }
+
+    /*管理员首页获取相关信息*/
+    @Override
+    public AdminStatsResponse getAdminStats() {
+        log.info("开始通过 Mapper 直接统计后台数据...");
+        // 1. 统计用户
+        long userCount = userMapper.selectCount(Wrappers.lambdaQuery(User.class).eq(User::getDeleted, 0));
+
+        // 2. 统计评价 (直接调 Mapper)
+        long reviewCount = reviewMapper.selectCount(Wrappers.lambdaQuery(Review.class).eq(Review::getDeleted, 0));
+
+        // 3. 统计订单
+        long orderCount = orderMapper.selectCount(Wrappers.lambdaQuery(Order.class).eq(Order::getDeleted, 0));
+
+        // 4. 统计服务类型
+        long serviceCount = serviceTypeMapper.selectCount(Wrappers.lambdaQuery(ServiceType.class).eq(ServiceType::getDeleted, 0));
+
+        log.info("统计数据获取完成: 用户={}, 服务={}, 订单={}, 评价={}",
+                userCount, serviceCount, orderCount, reviewCount);
+
+        return new AdminStatsResponse(userCount, serviceCount, orderCount, reviewCount);
+    }
+
+    /*
+     * 分页获取用户列表
+     * */
+    @Override
+    public Page<User> getUserList(int pageNum, int pageSize, String keyword, Integer userType, Integer status, Integer verified, Integer role) {
+        Page<User> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
+
+        // 1. 过滤已删除用户
+        wrapper.eq(User::getDeleted, 0);
+
+        // 2. 关键词搜索（用户名、手机号或昵称）
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(User::getUsername, keyword)
+                    .or().like(User::getPhone, keyword)
+                    .or().like(User::getNickname, keyword));
+        }
+
+        // ✅ 3. 动态拼接筛选条件 (修复了重复代码和变量未定义的问题)
+        if (userType != null) {
+            wrapper.eq(User::getUserType, userType);
+        }
+        if (status != null) {
+            wrapper.eq(User::getStatus, status);
+        }
+        if (verified != null) {
+            wrapper.eq(User::getVerified, verified);
+        }
+        if (role != null) {
+            wrapper.eq(User::getRole, role);
+        }
+
+        // 4. 按创建时间倒序
+        wrapper.orderByDesc(User::getCreateTime);
+
+        return userMapper.selectPage(page, wrapper);
+    }
+
+    @Override
+    public void updateUserStatusByAdmin(Long userId, Integer status, Integer verified, Integer role) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // ✅ 只更新允许的字段，保护用户名、手机号等敏感信息不被篡改
+        if (status != null) user.setStatus(status);
+        if (verified != null) user.setVerified(verified);
+        if (role != null) user.setRole(role);
+
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.updateById(user);
+    }
+
+    /*
+    * 管理员删除用户
+    * */
+    @Override
+    public void deleteUserByAdmin(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // ✅ 方案二：使用 UpdateWrapper 强制更新 deleted 字段
+        // 原理：直接生成 UPDATE user SET deleted = 1, update_time = ... WHERE id = ?
+        LambdaUpdateWrapper<User> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(User::getId, userId)
+                .set(User::getDeleted, 1)
+                .set(User::getUpdateTime, LocalDateTime.now());
+
+        int rows = userMapper.update(null, updateWrapper);
+
+        if (rows <= 0) {
+            throw new BusinessException("删除失败");
+        }
+
+        log.info("用户已被逻辑删除: userId={}", userId);
+    }
+
 }

@@ -7,18 +7,7 @@
 
       <div class="edit-form-card">
         <form @submit.prevent="handleSubmit">
-          <div class="form-group">
-            <label for="username" class="form-label">用户名</label>
-            <input
-                type="text"
-                id="username"
-                v-model="editForm.username"
-                class="form-input"
-                placeholder="请输入用户名"
-                required
-            />
-          </div>
-
+          <!-- 昵称 -->
           <div class="form-group">
             <label for="nickname" class="form-label">昵称</label>
             <input
@@ -30,18 +19,7 @@
             />
           </div>
 
-          <div class="form-group">
-            <label for="phone" class="form-label">手机号</label>
-            <input
-                type="tel"
-                id="phone"
-                v-model="editForm.phone"
-                class="form-input"
-                placeholder="请输入手机号"
-                required
-            />
-          </div>
-
+          <!-- 邮箱 -->
           <div class="form-group">
             <label for="email" class="form-label">邮箱</label>
             <input
@@ -79,12 +57,9 @@ import axios from '../../api'
 const router = useRouter()
 const userStore = useUserStore()
 
-// 编辑表单
+// 编辑表单：只包含允许修改的字段
 const editForm = ref({
-  id: '',
-  username: '',
   nickname: '',
-  phone: '',
   email: ''
 })
 
@@ -100,64 +75,25 @@ const goBack = () => {
 const handleSubmit = async () => {
   isLoading.value = true
   try {
-    // 确保 id 存在
-    if (!editForm.value.id) {
-      ElMessage.error('用户信息不完整，请重新登录')
-      return
-    }
-
-    // 确保 id 是数字类型
+    // 构造符合后端 UpdateProfileRequest DTO 的数据
     const submitData = {
-      ...editForm.value,
-      id: parseInt(editForm.value.id)
+      nickname: editForm.value.nickname,
+      email: editForm.value.email
     }
 
-    console.log('提交的数据:', submitData)
+    // 直接调用 Store 的方法
+    await userStore.updateUserInfo(submitData)
 
-    // 发送修改请求
-    const response = await axios.put('/user/center/modify', submitData)
-    console.log('修改成功:', response)
+    ElMessage.success('资料修改成功')
 
-    if (response.data && response.data.code === 200) {
-      ElMessage.success('修改成功，为了账号安全，请重新登录')
-    // 退出登录
-    userStore.logout()
+    // 因为 Store 里可能已经更新了 user 状态，或者你可以再次调用 getUserInfo 确保最新
+    await userStore.getUserInfo()
 
-    // 跳转到登录页面
-      setTimeout(() => {
-        router.push('/login')
-      }, 1500)
-    } else {
-      ElMessage.error(response.data?.message || '修改失败，请稍后重试')
-    }
+    setTimeout(() => {
+      router.push('/user/center')
+    }, 1000)
   } catch (error) {
-    console.error('修改失败:', error)
-
-    if (error.response) {
-      const status = error.response.status
-      const message = error.response.data?.message
-
-      switch (status) {
-        case 401:
-          ElMessage.error('未授权，请重新登录')
-          break
-        case 403:
-          ElMessage.error('没有权限执行此操作')
-          break
-        case 404:
-          ElMessage.error('请求的资源不存在')
-          break
-        case 500:
-          ElMessage.error('服务器错误，请稍后重试')
-          break
-        default:
-          ElMessage.error(message || '修改失败，请检查网络连接')
-      }
-    } else if (error.request) {
-      ElMessage.error('网络错误，请检查网络连接')
-    } else {
-      ElMessage.error('请求配置错误')
-    }
+    ElMessage.error(error.message || '修改失败')
   } finally {
     isLoading.value = false
   }
@@ -166,68 +102,18 @@ const handleSubmit = async () => {
 // 初始化表单数据
 onMounted(async () => {
   try {
-    console.log('开始获取用户信息...')
     // 获取用户信息
     await userStore.getUserInfo()
-    console.log('获取用户信息成功')
 
     // 填充表单数据
     const user = userStore.getUser
-    console.log('用户信息:', user)
-    
-    if (user && user.id) {
-      editForm.value.id = user.id
-      editForm.value.username = user.username || ''
+    if (user) {
       editForm.value.nickname = user.nickname || ''
-      editForm.value.phone = user.phone || ''
       editForm.value.email = user.email || ''
-      console.log('表单数据填充完成')
-    } else {
-      console.error('用户信息不完整，缺少id')
-      // 尝试从localStorage获取用户信息
-      const cachedUserInfo = localStorage.getItem('userInfo')
-      if (cachedUserInfo) {
-        try {
-          const userData = JSON.parse(cachedUserInfo)
-          if (userData.id) {
-            editForm.value.id = userData.id
-            editForm.value.username = userData.username || ''
-            editForm.value.nickname = userData.nickname || ''
-            editForm.value.phone = userData.phone || ''
-            editForm.value.email = userData.email || ''
-            console.log('从缓存获取用户信息')
-          }
-        } catch (e) {
-          console.error('解析缓存用户信息失败:', e)
-        }
-      }
-      ElMessage.error('用户信息不完整，可能需要重新登录')
     }
   } catch (error) {
     console.error('获取用户信息失败:', error)
-    if (error.response) {
-      console.error('错误响应:', error.response)
-      console.error('错误状态:', error.response.status)
-      console.error('错误数据:', error.response.data)
-    }
-    // 尝试从localStorage获取用户信息
-    const cachedUserInfo = localStorage.getItem('userInfo')
-    if (cachedUserInfo) {
-      try {
-        const userData = JSON.parse(cachedUserInfo)
-        if (userData.id) {
-          editForm.value.id = userData.id
-          editForm.value.username = userData.username || ''
-          editForm.value.nickname = userData.nickname || ''
-          editForm.value.phone = userData.phone || ''
-          editForm.value.email = userData.email || ''
-          console.log('从缓存获取用户信息')
-        }
-      } catch (e) {
-        console.error('解析缓存用户信息失败:', e)
-      }
-    }
-    ElMessage.error('获取用户信息失败，可能需要重新登录')
+    ElMessage.error('获取用户信息失败，请检查网络连接')
   }
 })
 </script>
@@ -252,7 +138,7 @@ onMounted(async () => {
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
-  max-width: 600px;
+  max-width: 500px; /* 调小宽度，因为表单项变少了 */
   margin: 0 auto;
   margin-bottom: var(--spacing-2xl);
 }

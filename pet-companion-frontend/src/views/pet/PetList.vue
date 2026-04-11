@@ -4,7 +4,12 @@
     
     <div class="container">
       <div class="page-header">
+        <div class="header-left">
+          <button class="btn-back" @click="goBack">
+            返回个人中心
+          </button>
         <h2 class="page-title">我的宠物</h2>
+        </div>
         <router-link to="/user/pets/add" class="btn-primary">添加宠物</router-link>
       </div>
       
@@ -33,13 +38,20 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
 import { usePetStore } from '../../store/pet'
 
+const router = useRouter()
 const petStore = usePetStore()
 const pets = ref([])
 
+
+// 返回个人中心
+const goBack = () => {
+  router.push('/user/center')
+}
 // 删除宠物
 const deletePet = async (id) => {
   if (confirm('确定要删除这个宠物吗？')) {
@@ -71,7 +83,28 @@ onMounted(async () => {
 })
 </script>
 
+
 <style scoped>
+
+.btn-primary {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--cta-color, #0369a1); /* 使用主题色，如果变量失效则用默认蓝色 */
+  color: white; /* 强制字体为白色 */
+  text-decoration: none;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+  font-weight: 500;
+
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-color, #0284c7); /* 悬停时稍微变亮或变深 */
+  color: white; /* 确保悬停时字体依然是白色 */
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
 .pet-list {
   min-height: 100vh;
   display: flex;
@@ -84,6 +117,28 @@ onMounted(async () => {
   align-items: center;
   margin-top: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
+  gap: 20px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--light-text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+}
+
+.btn-back:hover {
+  color: var(--primary-color);
+  background-color: rgba(3, 105, 161, 0.1);
 }
 
 .page-title {
@@ -163,7 +218,17 @@ onMounted(async () => {
     align-items: flex-start;
     gap: var(--spacing-md);
   }
-  
+
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
   .page-title {
     font-size: 1.5rem;
   }

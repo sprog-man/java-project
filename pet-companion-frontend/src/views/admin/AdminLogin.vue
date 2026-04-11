@@ -45,27 +45,38 @@ const form = ref({
 const isLoading = ref(false)
 const errorMessage = ref('')
 
+// ... existing code ...
 const handleSubmit = async () => {
   isLoading.value = true
   errorMessage.value = ''
   try {
     const response = await api.post('/user/admin/login', form.value)
-    if (response.data.success) {
+
+    // 修正：适配后端 Result 类的返回格式 (code: 200)
+    if (response.data && response.data.code === 200) {
       const { accessToken, adminInfo } = response.data.data
+
+      console.log('管理员登录成功:', adminInfo)
+
+      // 存储 Token 和管理员信息
       localStorage.setItem('token', accessToken)
       localStorage.setItem('userInfo', JSON.stringify({
         id: adminInfo.id,
         username: adminInfo.username,
         nickname: adminInfo.nickname,
         avatar: adminInfo.avatar,
-        role: 1 // 管理员角色
+        role: 1 // 强制设置为管理员角色
       }))
+
+      // 跳转到后台中心
       router.push('/admin/center')
     } else {
-      errorMessage.value = response.data.message || '登录失败'
+      // 业务逻辑失败（如密码错误）
+      errorMessage.value = response.data?.message || '登录失败'
     }
   } catch (error) {
     console.error('登录失败:', error)
+    // 网络错误或服务器异常
     errorMessage.value = error.response?.data?.message || '登录失败，请检查网络连接'
   } finally {
     isLoading.value = false

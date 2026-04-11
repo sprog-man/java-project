@@ -41,29 +41,31 @@ CREATE TABLE IF NOT EXISTS `pet` (
 
 -- 服务提供者表
 CREATE TABLE IF NOT EXISTS `service_provider` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '提供者ID',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `real_name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
-  `id_card` VARCHAR(20) NOT NULL COMMENT '身份证号',
-  `id_card_photo` VARCHAR(255) DEFAULT NULL COMMENT '身份证照片',
-  `verify_status` TINYINT DEFAULT 0 COMMENT '审核状态：0-待审核，1-审核通过，2-审核拒绝',
-  `service_radius` INT DEFAULT 5 COMMENT '服务半径（公里）',
-  `rating` DOUBLE DEFAULT 5.0 COMMENT '平均评分',
-  `review_count` INT DEFAULT 0 COMMENT '评价数量',
-  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='服务提供者表';
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '提供者ID',
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+     `real_name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
+    `id_card` VARCHAR(20) NOT NULL COMMENT '身份证号',
+    `id_card_photo` VARCHAR(255) DEFAULT NULL COMMENT '身份证照片',
+    `experience` TEXT DEFAULT NULL COMMENT '服务经验描述', -- ✅ 新增字段
+    `verify_status` TINYINT DEFAULT 0 COMMENT '审核状态：0-待审核，1-审核通过，2-审核拒绝',
+    `service_radius` INT DEFAULT 5 COMMENT '服务半径（公里）',
+    `latitude` DOUBLE DEFAULT NULL COMMENT '纬度',
+    `longitude` DOUBLE DEFAULT NULL COMMENT '经度',
+    `rating` DOUBLE DEFAULT 5.0 COMMENT '平均评分',
+    `review_count` INT DEFAULT 0 COMMENT '评价数量',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='服务提供者表';
 
 -- 服务类型表
 CREATE TABLE IF NOT EXISTS `service_type` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '服务类型ID',
   `name` VARCHAR(50) NOT NULL COMMENT '服务名称',
   `description` TEXT DEFAULT NULL COMMENT '服务描述',
-  `base_price` DOUBLE NOT NULL COMMENT '基础价格',
-  `price_per_hour` DOUBLE NOT NULL COMMENT '每小时价格',
+  `price` DOUBLE NOT NULL COMMENT '每小时价格',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
@@ -72,63 +74,69 @@ CREATE TABLE IF NOT EXISTS `service_type` (
 
 -- 订单表
 CREATE TABLE IF NOT EXISTS `pet_order` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单ID',
-  `order_no` VARCHAR(50) NOT NULL COMMENT '订单号',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `provider_id` BIGINT DEFAULT NULL COMMENT '服务提供者ID',
-  `pet_id` BIGINT NOT NULL COMMENT '宠物ID',
-  `service_type_id` BIGINT NOT NULL COMMENT '服务类型ID',
-  `service_start_time` DATETIME NOT NULL COMMENT '服务开始时间',
-  `service_end_time` DATETIME NOT NULL COMMENT '服务结束时间',
-  `address` VARCHAR(255) NOT NULL COMMENT '服务地址',
-  `price` DOUBLE NOT NULL COMMENT '订单价格',
-  `status` TINYINT DEFAULT 1 COMMENT '订单状态：1-待支付，2-待接单，3-服务中，4-待评价，5-已完成，6-已取消',
-  `pay_status` TINYINT DEFAULT 0 COMMENT '支付状态：0-未支付，1-已支付，2-退款中，3-已退款',
-  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_order_no` (`order_no`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_provider_id` (`provider_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单ID',
+    `order_no` VARCHAR(50) NOT NULL COMMENT '订单号',
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `provider_id` BIGINT DEFAULT NULL COMMENT '服务提供者ID',
+    `pet_id` BIGINT NOT NULL COMMENT '宠物ID',
+    `service_type_id` BIGINT NOT NULL COMMENT '服务类型ID',
+    `service_start_time` DATETIME NOT NULL COMMENT '服务开始时间',
+    `service_end_time` DATETIME NOT NULL COMMENT '服务结束时间',
+    `address` VARCHAR(255) NOT NULL COMMENT '服务地址',
+    `phone` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
+    `notes` TEXT DEFAULT NULL COMMENT '备注信息',
+    `price` DOUBLE NOT NULL COMMENT '订单价格',
+    `status` TINYINT DEFAULT 1 COMMENT '订单状态：1-待支付，2-待接单，3-已接单，4-服务中，5-已完成，6-已取消',
+    `pay_status` TINYINT DEFAULT 0 COMMENT '支付状态：0-未支付，1-已支付，2-退款中，3-已退款',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_order_no` (`order_no`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_provider_id` (`provider_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
 
+-- ... existing code ...
 -- 评价表
 CREATE TABLE IF NOT EXISTS `review` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '评价ID',
-  `order_id` BIGINT NOT NULL COMMENT '订单ID',
-  `user_id` BIGINT NOT NULL COMMENT '评价用户ID',
-  `target_id` BIGINT NOT NULL COMMENT '被评价用户ID',
-  `rating` TINYINT NOT NULL COMMENT '评分（1-5星）',
-  `content` TEXT DEFAULT NULL COMMENT '评价内容',
-  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_order_id` (`order_id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_target_id` (`target_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评价表';
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '评价ID',
+    `order_id` BIGINT NOT NULL COMMENT '订单ID',
+    `user_id` BIGINT NOT NULL COMMENT '评价用户ID',
+    `target_id` BIGINT NOT NULL COMMENT '被评价用户ID',
+    `provider_id` BIGINT DEFAULT NULL COMMENT '服务提供者ID',
+    `rating` TINYINT NOT NULL COMMENT '评分（1-5星）',
+    `content` TEXT DEFAULT NULL COMMENT '评价内容',
+    `images` TEXT DEFAULT NULL COMMENT '评价图片URL，多张用逗号分隔',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    KEY `idx_order_id` (`order_id`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_target_id` (`target_id`),
+    KEY `idx_provider_id` (`provider_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评价表';
+-- ... existing code ...
+
 -- 支付记录表--
 CREATE TABLE IF NOT EXISTS `payment_record` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '支付记录ID',
-  `order_id` BIGINT NOT NULL COMMENT '订单ID',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `amount` DOUBLE NOT NULL COMMENT '支付金额',
-  `payment_method` VARCHAR(20) NOT NULL COMMENT '支付方式',
-  `transaction_id` VARCHAR(100) NOT NULL COMMENT '交易号',
-  `status` TINYINT DEFAULT 0 COMMENT '支付状态：0-待支付，1-已支付，2-退款中，3-已退款',
-  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_transaction_id` (`transaction_id`),
-  KEY `idx_order_id` (`order_id`),
-  KEY `idx_user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付记录表';
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '支付记录ID',
+    `order_id` BIGINT NOT NULL COMMENT '订单ID',
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `amount` DOUBLE NOT NULL COMMENT '支付金额',
+    `payment_method` VARCHAR(20) NOT NULL COMMENT '支付方式',
+    `pay_order_no` VARCHAR(50) DEFAULT NULL COMMENT '内部支付单号',
+    `transaction_id` VARCHAR(100) NOT NULL COMMENT '交易号',
+    `status` TINYINT DEFAULT 0 COMMENT '支付状态：0-待支付，1-已支付，2-退款中，3-已退款',
+    `pay_time` DATETIME DEFAULT NULL COMMENT '支付时间',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_transaction_id` (`transaction_id`),
+    KEY `idx_order_id` (`order_id`),
+    KEY `idx_user_id` (`user_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付记录表';
 
--- 初始化服务类型数据（如果不存在）
-INSERT IGNORE INTO `service_type` (`name`, `description`, `base_price`, `price_per_hour`) VALUES
-('上门喂养', '专业宠物喂养服务，包括喂食、换水、清理餐具等', 30.0, 20.0),
-('遛狗', '专业遛狗服务，保证狗狗运动量', 20.0, 15.0),
-('带宠物出行', '陪同宠物出行，包括就医、美容等', 50.0, 30.0);
+

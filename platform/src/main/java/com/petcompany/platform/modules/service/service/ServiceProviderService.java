@@ -46,4 +46,18 @@ public interface ServiceProviderService {
      */
     List<OrderResponse> getProviderOrderList(Long providerId);
 
+    /**
+     * 统计服务提供者的已完成订单数
+     */
+    Long countCompletedOrders(Long providerId);
+
+    /**
+     * 管理员审核服务者申请
+     */
+    void auditApplication(Long providerId, Integer status);
+
+
+    List<ServiceProvider> getPendingApplications();
+
+
 }

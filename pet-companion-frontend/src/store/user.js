@@ -103,35 +103,47 @@ export const useUserStore = defineStore('user', {
         const response = await axios.get('/user/info')
         console.log('getUserInfo响应:', response)
 
-        // 适配响应拦截器返回的格式
-        if (response.code === 200) {
-          if (response.data) {
-            this.user = response.data
-            // 缓存用户信息到localStorage
-            localStorage.setItem('userInfo', JSON.stringify(response.data))
-            return response.data
+        // 修正：适配 axios 完整响应结构，业务数据在 response.data 中
+        if (response.data && response.data.code === 200) {
+          if (response.data.data) {
+            this.user = response.data.data
+            localStorage.setItem('userInfo', JSON.stringify(response.data.data))
+            return response.data.data
           } else {
-            console.error('用户数据为空')
             throw new Error('用户数据为空')
           }
         } else {
-          console.error('获取用户信息失败:', response.message)
-          throw new Error(response.message || '获取用户信息失败')
+          throw new Error(response.data?.message || '获取用户信息失败')
         }
       } catch (error) {
         console.error('获取用户信息失败:', error)
-        // 从localStorage获取缓存的用户信息
+        // 尝试从缓存恢复，防止页面刷新后状态丢失
         const cachedUserInfo = localStorage.getItem('userInfo')
         if (cachedUserInfo) {
-          try {
-            const userData = JSON.parse(cachedUserInfo)
-            this.user = userData
-            console.log('从缓存获取用户信息成功')
-            return userData
-          } catch (e) {
-            console.error('解析缓存用户信息失败:', e)
-          }
+          this.user = JSON.parse(cachedUserInfo)
+          return this.user
         }
+        throw error
+      }
+    },
+    // 修改密码
+    async changePassword(passwordData) {
+      try {
+        console.log('Store: 开始修改密码')
+        // 发送修改密码请求，axios 会自动将对象转换为 JSON
+        const response = await axios.put('/user/center/password', passwordData)
+
+        console.log('Store: changePassword 原始响应:', response)
+
+        if (response.data && response.data.code === 200) {
+          console.log('Store: 密码修改成功')
+          return response.data
+        } else {
+          console.error('Store: 密码修改业务失败:', response.data?.message)
+          throw new Error(response.data?.message || '密码修改失败')
+        }
+      } catch (error) {
+        console.error('Store: 密码修改异常:', error)
         throw error
       }
     },
@@ -140,19 +152,28 @@ export const useUserStore = defineStore('user', {
     // 更新用户信息
     async updateUserInfo(userData) {
       try {
+        console.log('Store: 开始更新用户信息', userData)
         // 发送更新用户信息请求
         const response = await axios.put('/user/center/modify', userData)
-        console.log('updateUserInfo响应:', response)
-        // 适配响应拦截器返回的格式
-        if (response.code === 200) {
-          // 这里后端可能不返回data，只返回成功消息
-          return response
+
+        console.log('Store: updateUserInfo 原始响应:', response)
+
+        // 适配 axios 响应结构：response.data 才是后端返回的 Result 对象
+        if (response.data && response.data.code === 200) {
+          console.log('Store: 更新成功')
+
+          // 可选：如果后端返回了更新后的完整用户信息，可以在这里同步更新 state
+          // if (response.data.data) {
+          //   this.user = response.data.data
+          // }
+
+          return response.data
         } else {
-          console.error('更新用户信息失败:', response.message)
-          throw new Error(response.message || '更新用户信息失败')
+          console.error('Store: 更新用户信息业务失败:', response.data?.message)
+          throw new Error(response.data?.message || '更新用户信息失败')
         }
       } catch (error) {
-        console.error('更新用户信息失败:', error)
+        console.error('Store: 更新用户信息异常:', error)
         throw error
       }
     },

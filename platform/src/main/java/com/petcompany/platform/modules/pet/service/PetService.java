@@ -1,5 +1,6 @@
 package com.petcompany.platform.modules.pet.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.modules.pet.dto.PetCreateRequest;
 import com.petcompany.platform.modules.pet.dto.PetResponse;
 import com.petcompany.platform.modules.pet.dto.PetUpdateRequest;
@@ -36,5 +37,10 @@ public interface PetService {
      * 获取用户的宠物列表
      */
     List<PetResponse> getPetListByUserId(Long userId);
+
+    /*
+    * 管理员获取所有宠物列表(分页)
+    * */
+    Page<PetResponse> getAdminPetPage(int page,int size,String keyword);
 
 }

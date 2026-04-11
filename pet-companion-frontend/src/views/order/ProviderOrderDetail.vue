@@ -86,7 +86,7 @@
           >
             完成服务
           </button>
-          <router-link to="/provider/orders" class="btn-outline">返回列表</router-link>
+          <router-link to="/server/order-management" class="btn-outline">返回列表</router-link>
         </div>
       </div>
     </div>
