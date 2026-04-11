@@ -1,10 +1,14 @@
 package com.petcompany.platform.modules.order.controller;
 
 import com.petcompany.platform.common.result.Result;
+import com.petcompany.platform.infrastructure.security.CustomUserDetails;
+import com.petcompany.platform.infrastructure.security.annotation.RequiresPermission;
 import com.petcompany.platform.modules.order.dto.OrderCreateRequest;
 import com.petcompany.platform.modules.order.dto.OrderResponse;
 import com.petcompany.platform.modules.order.service.OrderService;
+import com.petcompany.platform.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
@@ -27,9 +31,17 @@ public class OrderController {
      * GET /order
      */
     @GetMapping
-    public Result<List<OrderResponse>> getOrderList() {
-        // TODO: 后续从 SecurityContext 获取真实 userId，目前暂时查所有或硬编码
-        Long currentUserId = 1L;
+    public Result<List<OrderResponse>> getOrderList(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long currentUserId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            currentUserId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
         log.info("接收到获取用户 {} 的订单列表请求", currentUserId);
         List<OrderResponse> orders = orderService.getOrderListByUserId(currentUserId);
         return Result.success("获取订单列表成功", orders);
@@ -124,6 +136,19 @@ public class OrderController {
         log.info("接收到获取待接单订单列表请求");
         List<OrderResponse> orders = orderService.getPendingOrderList();
         return Result.success("获取待接单订单列表成功", orders);
+    }
+
+    /**
+     * ✅ 10. 获取服务者订单统计数据 (Dashboard 专用)
+     * GET /order/provider/stats
+     */
+    @GetMapping("/provider/stats")
+    // ✅ 修复：确保 userTypes 包含 2 (服务者)
+    @RequiresPermission(userTypes = {0, 1, 2})
+    public Result<?> getProviderStats() {
+        log.info("接收到获取服务者统计数据请求");
+        // 调用 Service 层获取真实数据
+        return Result.success(orderService.getProviderStats());
     }
 
 }

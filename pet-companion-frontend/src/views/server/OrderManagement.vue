@@ -3,71 +3,78 @@
     <Header />
     
     <div class="container">
-      <h2 class="page-title">订单管理</h2>
-      <p class="page-subtitle">管理您接取的订单任务</p>
+      <!-- 返回按钮 -->
+      <div class="back-button-container">
+        <button class="back-button" @click="navigateBack">
+          ← 返回仪表盘
+        </button>
+      </div>
       
+      <h2 class="page-title">我的订单</h2>
+      <p class="page-subtitle">管理您已接取的服务任务</p>
+
       <!-- 订单状态筛选 -->
       <div class="filter-section">
-        <button 
-          v-for="status in orderStatuses" 
-          :key="status.value"
-          :class="['filter-btn', { active: selectedStatus === status.value }]"
-          @click="selectedStatus = status.value"
+        <button
+            v-for="status in orderStatuses"
+            :key="status.value"
+            :class="['filter-btn', { active: selectedStatus === status.value }]"
+            @click="selectedStatus = status.value"
         >
           {{ status.label }}
         </button>
       </div>
-      
+
       <!-- 订单列表 -->
       <div class="order-card" v-for="order in filteredOrders" :key="order.id">
         <div class="order-header">
           <div class="order-no">订单号：{{ order.orderNo }}</div>
-          <div class="order-time">创建时间：{{ order.createTime }}</div>
-          <div :class="['status-badge', order.status]">
-            {{ getStatusText(order.status) }}
-          </div>
+          <div class="order-status" :class="`status-${order.status}`">{{ order.statusText }}</div>
         </div>
-        
+
         <div class="order-content">
           <div class="service-info">
-            <h3>{{ order.serviceName }}</h3>
-            <p class="service-time">{{ order.serviceTime }}</p>
-            <p class="service-address">{{ order.address }}</p>
-            <p class="contact-info">联系人：{{ order.contactName }} {{ order.contactPhone }}</p>
+            <h3>{{ order.serviceName }} - {{ order.petName }}</h3>
+            <p class="service-time">⏰ {{ order.serviceTime }}</p>
+            <p class="service-address">📍 {{ order.address }}</p>
+            <p class="contact-info">📞 {{ order.phone }}</p>
           </div>
-          <div class="order-price">¥{{ order.price }}</div>
+          <div class="order-price">¥{{ Number(order.price).toFixed(2) }}</div>
         </div>
-        
+
         <div class="order-actions">
           <router-link :to="`/provider/orders/${order.id}`" class="btn-outline">查看详情</router-link>
-          <button 
-            class="btn-primary" 
-            v-if="order.status === 'IN_SERVICE'"
-            @click="completeOrder(order.id)"
-          >
-            完成订单
-          </button>
-          <button 
-            class="btn-primary" 
-            v-else-if="order.status === 'PENDING_SERVICE'"
-            @click="startService(order.id)"
+
+          <!-- ✅ 1. 已接单状态：显示【开始服务】 -->
+          <button
+              class="btn-primary"
+              v-if="order.status === 'ACCEPTED'"
+              @click="handleStartService(order.id)"
           >
             开始服务
           </button>
+
+          <!-- ✅ 2. 服务中状态：显示【完成订单】 -->
+          <button
+              class="btn-success"
+              v-if="order.status === 'IN_SERVICE'"
+              @click="handleCompleteOrder(order.id)"
+          >
+            完成订单
+          </button>
         </div>
       </div>
-      
-      <div v-if="filteredOrders.length === 0" class="empty-order">
-        <p>暂无订单</p>
+
+      <div v-if="!isLoading && filteredOrders.length === 0" class="empty-order">
+        <p>暂无相关订单</p>
       </div>
     </div>
-    
+
     <Footer />
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
+<script setup>import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
@@ -75,109 +82,67 @@ import { useOrderStore } from '../../store/order'
 
 const router = useRouter()
 const orderStore = useOrderStore()
-const orders = ref([])
 const selectedStatus = ref('all')
+const isLoading = ref(false)
 
-// 订单状态选项
+// 返回仪表盘
+const navigateBack = () => {
+  router.push('/server/dashboard')
+}
+
+// ✅ 更新状态选项以匹配后端返回的字符串
 const orderStatuses = [
   { value: 'all', label: '全部' },
-  { value: 'PENDING_SERVICE', label: '待服务' },
+  { value: 'ACCEPTED', label: '已接单' },
   { value: 'IN_SERVICE', label: '服务中' },
   { value: 'COMPLETED', label: '已完成' }
 ]
 
-// 过滤后的订单列表
 const filteredOrders = computed(() => {
+  const allOrders = orderStore.orders || []
   if (selectedStatus.value === 'all') {
-    return orders.value
+    return allOrders
   }
-  return orders.value.filter(order => order.status === selectedStatus.value)
+  return allOrders.filter(order => order.status === selectedStatus.value)
 })
 
-// 获取订单状态文本
-const getStatusText = (status) => {
-  const statusMap = {
-    'PENDING_SERVICE': '待服务',
-    'IN_SERVICE': '服务中',
-    'COMPLETED': '已完成'
-  }
-  return statusMap[status] || '未知'
-}
-
 // 开始服务
-const startService = (id) => {
-  // 这里应该调用后端API开始服务
-  console.log('开始服务:', id)
-  // 模拟更新订单状态
-  const order = orders.value.find(o => o.id === id)
-  if (order) {
-    order.status = 'IN_SERVICE'
+const handleStartService = async (id) => {
+  if (!confirm('确定要开始这项服务吗？')) return
+  try {
+    await orderStore.startOrder(id)
+    alert('服务已开始！请认真服务哦。')
+    await fetchProviderOrders()
+  } catch (error) {
+    alert('操作失败：' + error.message)
   }
-  alert('服务已开始！')
 }
 
 // 完成订单
-const completeOrder = (id) => {
-  // 这里应该调用后端API完成订单
-  console.log('完成订单:', id)
-  // 模拟更新订单状态
-  const order = orders.value.find(o => o.id === id)
-  if (order) {
-    order.status = 'COMPLETED'
+const handleCompleteOrder = async (id) => {
+  if (!confirm('确定要完成这个订单吗？完成后用户将进行评价。')) return
+  try {
+    await orderStore.completeOrder(id)
+    alert('订单已完成！感谢您的付出。')
+    await fetchProviderOrders()
+  } catch (error) {
+    alert('操作失败：' + error.message)
   }
-  alert('订单已完成！')
 }
 
-// 获取订单列表
-const fetchOrders = async () => {
+const fetchProviderOrders = async () => {
+  isLoading.value = true
   try {
-    // 这里应该从后端获取服务者接取的订单列表
-    // 暂时使用模拟数据
-    orders.value = [
-      {
-        id: 1,
-        orderNo: '20260410001',
-        serviceName: '宠物陪伴',
-        serviceTime: '2026-04-11 14:00-16:00',
-        address: '北京市朝阳区宠物大厦101室',
-        contactName: '王先生',
-        contactPhone: '138****1234',
-        price: 100,
-        status: 'PENDING_SERVICE',
-        createTime: '2026-04-10 10:00:00'
-      },
-      {
-        id: 2,
-        orderNo: '20260410002',
-        serviceName: '宠物遛弯',
-        serviceTime: '2026-04-12 09:00-10:00',
-        address: '北京市海淀区宠物小区202室',
-        contactName: '李女士',
-        contactPhone: '139****5678',
-        price: 40,
-        status: 'IN_SERVICE',
-        createTime: '2026-04-10 09:30:00'
-      },
-      {
-        id: 3,
-        orderNo: '20260409001',
-        serviceName: '宠物喂食',
-        serviceTime: '2026-04-10 18:00-19:00',
-        address: '北京市西城区宠物胡同303号',
-        contactName: '赵先生',
-        contactPhone: '137****9012',
-        price: 30,
-        status: 'COMPLETED',
-        createTime: '2026-04-09 16:00:00'
-      }
-    ]
+    await orderStore.getProviderOrderList()
   } catch (error) {
     console.error('获取订单列表失败', error)
+  } finally {
+    isLoading.value = false
   }
 }
 
 onMounted(() => {
-  fetchOrders()
+  fetchProviderOrders()
 })
 </script>
 
@@ -188,9 +153,34 @@ onMounted(() => {
   flex-direction: column;
 }
 
+.back-button-container {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-color);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.back-button:hover {
+  border-color: var(--cta-color);
+  color: var(--cta-color);
+  transform: translateX(-2px);
+}
+
 .page-title {
   font-size: 2rem;
-  margin-top: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
   color: var(--primary-color);
   text-align: center;

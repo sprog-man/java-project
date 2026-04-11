@@ -156,6 +156,8 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
             User user = userMapper.selectById(provider.getUserId());
             if (user != null) {
                 user.setVerified(1);
+                // ✅ 2. 【核心修复】同步更新用户类型为服务者 (假设 2 代表服务者)
+                user.setUserType(2);
                 user.setUpdateTime(LocalDateTime.now());
                 userMapper.updateById(user);
                 log.info("审核通过，已同步更新用户 {} 的认证状态为已认证", user.getId());

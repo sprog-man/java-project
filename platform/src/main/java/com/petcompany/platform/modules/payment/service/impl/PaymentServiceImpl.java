@@ -69,6 +69,9 @@ public class PaymentServiceImpl implements PaymentService {
         String payOrderNo = generatePayOrderNo();
         paymentRecord.setPayOrderNo(payOrderNo);
 
+        // ✅ 关键修复：初始化 transactionId 为空字符串，防止数据库报错
+        paymentRecord.setTransactionId("");
+
         paymentRecord.setStatus(0); // 待支付
         paymentRecord.setCreateTime(LocalDateTime.now());
         paymentRecord.setUpdateTime(LocalDateTime.now());
@@ -104,15 +107,8 @@ public class PaymentServiceImpl implements PaymentService {
         if (status == 1) { // 支付成功
             paymentRecord.setPayTime(LocalDateTime.now());
 
-            // ✅ 更新订单状态为已支付/待接单
-            Order order = orderService.getOrderById(paymentRecord.getOrderId());
-            if (order != null) {
-                order.setStatus(2); // 2-待接单
-                order.setPayStatus(1); // 1-已支付
-                // 注意：这里需要 OrderService 提供 updateOrder 方法，或者直接注入 OrderMapper
-                // 为了简化，假设你有一个方法能更新订单
-                // orderService.updateOrderStatus(order.getId(), 2, 1);
-            }
+            /// ✅ 关键：调用刚才写的方法，同步更新订单状态
+            orderService.updateOrderStatusAfterPay(paymentRecord.getOrderId());
         }
         paymentRecord.setUpdateTime(LocalDateTime.now());
         paymentRecordMapper.updateById(paymentRecord);

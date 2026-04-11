@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.common.exception.BusinessException;
 import com.petcompany.platform.infrastructure.security.JwtService;
+import com.petcompany.platform.infrastructure.security.CustomUserDetails;
 import com.petcompany.platform.modules.order.entity.Order;
 import com.petcompany.platform.modules.order.mapper.OrderMapper;
 import com.petcompany.platform.modules.review.entity.Review;
@@ -312,7 +313,13 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("用户未登录");
         }
 
-        Long userId = (Long) authentication.getPrincipal();
+        Long userId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
         User user = getUserById(userId);
 
         if (user == null) {
@@ -394,6 +401,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectPage(page, wrapper);
     }
 
+    /*
+    * 管理员在用户管理中编辑用户信息
+    * */
     @Override
     public void updateUserStatusByAdmin(Long userId, Integer status, Integer verified, Integer role) {
         User user = userMapper.selectById(userId);

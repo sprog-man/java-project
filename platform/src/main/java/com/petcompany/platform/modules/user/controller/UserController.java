@@ -83,8 +83,14 @@ public class UserController {
         if (authentication == null || !authentication.isAuthenticated()){
             return Result.fail(ResultCode.UNAUTHORIZED);
         }
-        // 假设 Principal 存储的是 userId (Long 类型)
-        Long userId = (Long) authentication.getPrincipal();
+        // 从 CustomUserDetails 中获取用户 ID
+        Long userId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof com.petcompany.platform.infrastructure.security.CustomUserDetails) {
+            userId = ((com.petcompany.platform.infrastructure.security.CustomUserDetails) principal).getUserId();
+        } else {
+            return Result.fail("无法获取当前用户信息");
+        }
         log.info("接收到更新用户信息请求: userId={},nickname={}", userId,request.getNickname());
         // 2. 将 DTO 和 userId 传递给 Service 层处理
         userService.updateUser(userId, request);
@@ -116,8 +122,14 @@ public class UserController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return Result.fail(ResultCode.UNAUTHORIZED);
         }
-        // 因为我们在 JwtAuthenticationFilter 里存入了 Long 类型的 userId
-        Long userId = (Long) authentication.getPrincipal();
+        // 从 CustomUserDetails 中获取用户 ID
+        Long userId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof com.petcompany.platform.infrastructure.security.CustomUserDetails) {
+            userId = ((com.petcompany.platform.infrastructure.security.CustomUserDetails) principal).getUserId();
+        } else {
+            return Result.fail("无法获取当前用户信息");
+        }
         log.info("接收到修改密码请求: userId={}", userId);
 
         // 2. 调用 Service 层处理业务逻辑

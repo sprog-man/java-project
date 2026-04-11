@@ -1,10 +1,12 @@
 package com.petcompany.platform.modules.pet.controller;
 
 import com.petcompany.platform.common.result.Result;
+import com.petcompany.platform.infrastructure.security.CustomUserDetails;
 import com.petcompany.platform.modules.pet.dto.PetCreateRequest;
 import com.petcompany.platform.modules.pet.dto.PetResponse;
 import com.petcompany.platform.modules.pet.dto.PetUpdateRequest;
 import com.petcompany.platform.modules.pet.service.PetService;
+import com.petcompany.platform.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +31,16 @@ public class PetController {
      */
     @PostMapping("/add")
     public Result<?> createPet(@Valid @RequestBody PetCreateRequest request, Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long userId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
         petService.createPet(userId, request);
         return Result.success("创建宠物成功");
     }
@@ -39,7 +50,16 @@ public class PetController {
      */
     @PutMapping("/update")
     public Result<?> updatePet(@Valid @RequestBody PetUpdateRequest request, Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long userId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
         petService.updatePet(userId, request);
         return Result.success("更新宠物成功");
     }
@@ -49,7 +69,16 @@ public class PetController {
      */
     @DeleteMapping("/{id}")
     public Result<?> deletePet(@PathVariable Long id, Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long userId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
         petService.deletePet(userId, id);
         return Result.success("删除宠物成功");
     }
@@ -59,7 +88,16 @@ public class PetController {
      */
     @GetMapping("/list")
     public Result<List<PetResponse>> getPetList(Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long userId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
         List<PetResponse> pets = petService.getPetListByUserId(userId);
         return Result.success(pets);
     }

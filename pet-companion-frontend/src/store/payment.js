@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import api from '../api/index'
+import axios from '../api/axios' // ✅ 必须确保这一行存在且路径正确
+
 
 export const usePaymentStore = defineStore('payment', {
   state: () => ({
@@ -11,44 +12,17 @@ export const usePaymentStore = defineStore('payment', {
   getters: {
     getPayments: (state) => state.payments
   },
-  
+
   actions: {
-    // 获取支付记录列表
+    // ✅ 1. 获取真实的支付记录列表
     async getPaymentList() {
       this.isLoading = true
       this.error = null
       try {
-        // 这里应该从后端获取支付记录列表
-        // 暂时使用模拟数据
-        this.payments = [
-          {
-            id: 1,
-            orderNo: '20260405001',
-            amount: 100,
-            paymentTime: '2026-04-05 10:30:00',
-            status: 'SUCCESS',
-            statusText: '支付成功',
-            type: 'PAYMENT'
-          },
-          {
-            id: 2,
-            orderNo: '20260401001',
-            amount: 40,
-            paymentTime: '2026-04-01 14:00:00',
-            status: 'SUCCESS',
-            statusText: '支付成功',
-            type: 'PAYMENT'
-          },
-          {
-            id: 3,
-            orderNo: '20260330001',
-            amount: 30,
-            paymentTime: '2026-03-30 09:00:00',
-            status: 'SUCCESS',
-            statusText: '退款成功',
-            type: 'REFUND'
-          }
-        ]
+        const response = await axios.get('/payment/list')
+        if (response.data && response.data.code === 200) {
+          this.payments = response.data.data
+        }
       } catch (error) {
         this.error = error.message
         console.error('获取支付记录失败', error)
@@ -56,19 +30,22 @@ export const usePaymentStore = defineStore('payment', {
         this.isLoading = false
       }
     },
-    
-    // 发起支付
-    async createPayment(orderId, amount) {
+
+    // ✅ 2. 发起支付（真实场景：调用微信/支付宝接口）
+    async createPayment(orderId, payType = 1) {
       this.isLoading = true
       this.error = null
       try {
-        // 这里应该调用后端API发起支付
-        console.log('发起支付:', orderId, amount)
-        // 模拟成功
-        return {
-          paymentId: 'P' + Date.now(),
-          status: 'SUCCESS'
+        // 对应后端: POST /payment/create
+        const response = await axios.post('/payment/create', {
+          orderId: orderId,
+          payType: payType // 1-微信, 2-支付宝
+        })
+
+        if (response.data && response.data.code === 200) {
+          return response.data.data
         }
+        throw new Error(response.data?.message || '创建支付单失败')
       } catch (error) {
         this.error = error.message
         console.error('发起支付失败', error)
@@ -77,15 +54,37 @@ export const usePaymentStore = defineStore('payment', {
         this.isLoading = false
       }
     },
-    
-    // 退款
+
+    // ✅ 3. 模拟支付成功（开发测试专用）
+    async mockPaySuccess(orderId) {
+      this.isLoading = true
+      this.error = null
+      try {
+        console.log(`正在模拟支付订单: ${orderId}`)
+        // 对应后端: GET /payment/mock/{orderId}
+        const response = await axios.get(`/payment/mock/${orderId}`)
+
+        if (response.data && response.data.code === 200) {
+          console.log('模拟支付成功:', response.data.message)
+          return true
+        }
+        throw new Error(response.data?.message || '模拟支付失败')
+      } catch (error) {
+        this.error = error.message
+        console.error('模拟支付异常', error)
+        throw error
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    // ✅ 4. 退款
     async refund(orderId, amount) {
       this.isLoading = true
       this.error = null
       try {
-        // 这里应该调用后端API发起退款
+        // TODO: 这里后续可以对接后端的退款接口
         console.log('发起退款:', orderId, amount)
-        // 模拟成功
         return {
           refundId: 'R' + Date.now(),
           status: 'SUCCESS'

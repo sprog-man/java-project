@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.common.exception.BusinessException;
 import com.petcompany.platform.common.service.AsyncService;
+import com.petcompany.platform.infrastructure.security.CustomUserDetails;
 import com.petcompany.platform.modules.order.dto.OrderCreateRequest;
 import com.petcompany.platform.modules.order.dto.OrderResponse;
 import com.petcompany.platform.modules.order.entity.Order;
@@ -100,7 +101,13 @@ public class OrderServiceImpl implements OrderService {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new BusinessException("用户未登录");
         }
-        Long currentUserId = (Long) authentication.getPrincipal();
+        Long currentUserId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            currentUserId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
 
         // 验证宠物是否存在
         Pet pet = petService.getPetById(request.getPetId());
@@ -149,7 +156,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException("订单价格不能为空");
             }
 
-            order.setStatus(2); // 2-待接单
+            order.setStatus(1); // ✅ 修改：1-待支付
             order.setPayStatus(0);
             order.setOrderNo(generateOrderNo());
             order.setCreateTime(LocalDateTime.now());
@@ -179,9 +186,9 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("订单不存在");
         }
 
-        // 验证订单状态
-        if (order.getStatus() != 1) { // 只有待支付状态可以取消
-            throw new BusinessException("订单状态不允许取消");
+        // ✅ 修改：允许取消“待支付”或“待接单”状态的订单
+        if (order.getStatus() != 1 && order.getStatus() != 2) {
+            throw new BusinessException("当前订单状态不允许取消");
         }
 
         // 更新订单状态
@@ -193,6 +200,10 @@ public class OrderServiceImpl implements OrderService {
         return convertToResponse(order);
     }
 
+
+    /*
+    * 接取订单
+    * */
     @Override
     public OrderResponse acceptOrder(Long id) {
         // 获取订单
@@ -206,12 +217,26 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("订单状态不允许接受");
         }
 
-        // 更新订单状态
-        order.setStatus(3); // 服务中
-        order.setProviderId(1L); // 暂时硬编码服务提供者ID
+
+        // ✅ 获取当前登录的服务者ID
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long providerId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            providerId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
+
+        // ✅ 更新状态为 3-已接单，并绑定服务者
+        order.setStatus(3); // ✅ 修改：3-已接单
+        order.setProviderId(providerId);
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
-        log.info("接受订单{}", id);
+        log.info("服务者 {} 接取订单 {}", providerId, id);
 
         return convertToResponse(order);
     }
@@ -224,16 +249,16 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("订单不存在");
         }
 
-        // 验证订单状态
-        if (order.getStatus() != 3) { // 只有服务中状态可以开始服务
-            throw new BusinessException("订单状态不允许开始服务");
+        // ✅ 只有“已接单”状态才能开始服务
+        if (order.getStatus() != 3) {
+            throw new BusinessException("请先接取订单后再开始服务");
         }
 
-        // 更新订单状态
-        order.setStatus(4); // 服务中
+        // ✅ 更新状态为 4-服务中
+        order.setStatus(4); // ✅ 修改：4-服务中
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
-        log.info("开始服务{}", id);
+        log.info("开始服务订单 {}", id);
 
         return convertToResponse(order);
     }
@@ -260,13 +285,36 @@ public class OrderServiceImpl implements OrderService {
         return convertToResponse(order);
     }
 
+
+
+
+    /*
+    * 服务者获取接取后订单列表
+    * */
     @Override
     public List<OrderResponse> getProviderOrderList() {
-        // 查询服务提供者订单列表
+        // ✅ 1. 从安全上下文中获取当前登录用户的 ID (服务者ID)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+        Long providerId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            providerId = ((CustomUserDetails) principal).getUserId();
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
+
+        // ✅ 2. 查询该服务者接取的、且状态属于【已接单、服务中、已完成】的订单
         LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Order::getProviderId, 1L); // 暂时硬编码服务提供者ID
+        wrapper.eq(Order::getProviderId, providerId);
+
+        // 3-已接单, 4-服务中, 5-已完成
+        wrapper.in(Order::getStatus, 3, 4, 5);
         wrapper.eq(Order::getDeleted, 0);
         wrapper.orderByDesc(Order::getCreateTime);
+
 
         List<Order> orders = orderMapper.selectList(wrapper);
         return orders.stream().map(this::convertToResponse).collect(Collectors.toList());
@@ -345,7 +393,7 @@ public class OrderServiceImpl implements OrderService {
         String serviceTime = order.getServiceStartTime().format(formatter) + "-" + order.getServiceEndTime().format(formatter);
         response.setServiceTime(serviceTime);
 
-        // 设置订单状态
+        // ✅ 更新状态映射逻辑
         switch (order.getStatus()) {
             case 1:
                 response.setStatus("PENDING_PAYMENT");
@@ -356,6 +404,9 @@ public class OrderServiceImpl implements OrderService {
                 response.setStatusText("待接单");
                 break;
             case 3:
+                response.setStatus("ACCEPTED"); // ✅ 新增：已接单
+                response.setStatusText("已接单");
+                break;
             case 4:
                 response.setStatus("IN_SERVICE");
                 response.setStatusText("服务中");
@@ -397,7 +448,8 @@ public class OrderServiceImpl implements OrderService {
     public Long countByProviderIdAndStatus(Long providerId, Integer status) {
         LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(Order::getProviderId, providerId)
-                .eq(Order::getStatus, status);
+                .eq(Order::getStatus, status)
+                .eq(Order::getDeleted, 0);
         return orderMapper.selectCount(wrapper);
     }
 
@@ -458,6 +510,72 @@ public class OrderServiceImpl implements OrderService {
             case "CANCELLED": return 6;
             default: return null;
         }
+    }
+    /*
+     * 当支付成功更改订单状态
+     * */
+    @Override
+    public void updateOrderStatusAfterPay(Long orderId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order != null) {
+            // 只有处于“待支付”状态的订单才能转为“待接单”
+            if (order.getStatus() == 1) {
+                order.setStatus(2); // 2-待接单
+                order.setPayStatus(1); // 1-已支付
+                order.setUpdateTime(LocalDateTime.now());
+                orderMapper.updateById(order);
+                log.info("订单 {} 支付成功，状态已更新为待接单", orderId);
+            }
+        }
+    }
+
+    /*
+     * 获取服务者订单统计数据
+     * */
+    @Override
+    public java.util.Map<String, Object> getProviderStats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BusinessException("用户未登录");
+        }
+
+        // ✅ 2. 修复：从 CustomUserDetails 中获取 ID，而不是直接强转 principal
+        Long providerId;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            providerId = ((CustomUserDetails) principal).getUserId();
+        } else if (principal instanceof Long) {
+            providerId = (Long) principal; // 兼容旧逻辑
+        } else {
+            throw new BusinessException("无法获取当前用户信息");
+        }
+
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+
+        // 1. 待处理订单 (已接单 + 服务中)
+        long pendingCount = countByProviderIdAndStatus(providerId, 3) +
+                countByProviderIdAndStatus(providerId, 4);
+        stats.put("pendingOrders", pendingCount);
+
+        // 2. 已完成订单
+        long completedCount = countByProviderIdAndStatus(providerId, 5);
+        stats.put("completedOrders", completedCount);
+
+        // 3. 总收入 (简单累加已完成订单的价格)
+        LambdaQueryWrapper<Order> earningWrapper = Wrappers.lambdaQuery();
+        earningWrapper.eq(Order::getProviderId, providerId)
+                .eq(Order::getStatus, 5) // 只算完成的
+                .eq(Order::getDeleted, 0);
+        List<Order> completedOrders = orderMapper.selectList(earningWrapper);
+        double totalEarnings = completedOrders.stream()
+                .mapToDouble(o -> o.getPrice() != null ? o.getPrice() : 0.0)
+                .sum();
+        stats.put("totalEarnings", totalEarnings);
+
+        // 4. 平均评分 (暂时给个默认值，后续可以对接评价表)
+        stats.put("averageRating", 4.8);
+
+        return stats;
     }
 
 }

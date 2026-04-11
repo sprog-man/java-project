@@ -176,6 +176,12 @@ const router = createRouter({
       meta: { requiresAuth: true } // 路由元信息，需要登录
     },
     {
+      path: '/server/completed-orders', // 服务者已完成订单路径
+      name: 'serverCompletedOrders', // 路由名称
+      component: () => import('../views/server/CompletedOrders.vue'), // 动态导入服务者已完成订单组件
+      meta: { requiresAuth: true } // 路由元信息，需要登录
+    },
+    {
       path: '/provider/apply', // 服务提供者申请路径
       name: 'providerApply', // 路由名称
       component: () => import('../views/service/ProviderApply.vue'), // 动态导入服务提供者申请组件

@@ -6,6 +6,7 @@ import com.petcompany.platform.modules.order.dto.OrderResponse;
 import com.petcompany.platform.modules.order.entity.Order;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 订单服务接口
@@ -80,5 +81,16 @@ public interface OrderService {
     * */
     Page<OrderResponse> getAdminOrderPage(int page, int size, String status, Long serviceTypeId, String keyword);
 
+
+    /**
+     * ✅ 新增：专门用于支付成功后更新订单状态
+     */
+    void updateOrderStatusAfterPay(Long orderId);
+
+
+    /*
+    * 获取服务中订单统计数据
+    * */
+    Map<String, Object> getProviderStats();
 }
 

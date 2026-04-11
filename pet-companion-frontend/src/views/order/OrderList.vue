@@ -33,24 +33,29 @@
         
         <div class="order-actions">
           <router-link :to="`/order/${order.id}`" class="btn-outline">查看详情</router-link>
-          <button 
-            v-if="order.status === 'PENDING' " 
-            class="btn-primary" 
-            @click="cancelOrder(order.id)"
-          >
-            取消订单
-          </button>
-          <button 
-            v-if="order.status === 'PENDING_PAYMENT' " 
-            class="btn-primary" 
-            @click="payOrder(order.id)"
+          <!-- ✅ 待支付状态：点击跳转到 OrderDetail 进行支付 -->
+          <button
+              v-if="order.status === 'PENDING_PAYMENT'"
+              class="btn-primary"
+              @click="payOrder(order.id)"
           >
             去支付
           </button>
-          <button 
-            v-if="order.status === 'COMPLETED' && !order.reviewed " 
-            class="btn-primary" 
-            @click="reviewOrder(order.id)"
+
+          <!-- ✅ 待接单或待支付状态：可以取消 -->
+          <button
+              v-if="order.status === 'PENDING' || order.status === 'PENDING_PAYMENT'"
+              class="btn-outline"              style="border-color: #ef4444; color: #ef4444;"
+              @click="cancelOrder(order.id)"
+          >
+            取消订单
+          </button>
+
+          <!-- ✅ 已完成且未评价：显示去评价 -->
+          <button
+              v-if="order.status === 'COMPLETED' && !order.reviewed"
+              class="btn-primary"
+              @click="reviewOrder(order.id)"
           >
             去评价
           </button>
@@ -71,10 +76,12 @@
 import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
+import { usePaymentStore } from '../../store/payment'
 import { useOrderStore } from '../../store/order'
 
-const router = useRouter()
+const paymentStore = usePaymentStore()
 const orderStore = useOrderStore()
+const router = useRouter()
 const orders = ref([]) // ✅ 这里的 orders 将从 Store 同步过来
 const currentStatus = ref('ALL')
 
@@ -107,6 +114,7 @@ const cancelOrder = async (id) => {
     }
   }
 }
+
 
 // 支付订单
 const payOrder = (id) => {

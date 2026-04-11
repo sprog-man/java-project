@@ -110,13 +110,13 @@ const loadStatistics = async () => {
     petCount.value = Array.isArray(petList) ? petList.length : 0
 
     // 2. 获取订单数量
-    const orderResponse = await axios.get('/order/orderInfo')
-    // 修正：从 response.data 中获取业务数据
-    const orderResult = orderResponse.data
-    if (orderResult && orderResult.code === 200) {
-      const orderData = orderResult.data || []
-      orderCount.value = Array.isArray(orderData) ? orderData.length : 0
-    }
+        const orderResponse = await axios.get('/order')
+        // 修正：从 response.data 中获取业务数据
+        const orderResult = orderResponse.data
+        if (orderResult && orderResult.code === 200) {
+          const orderData = orderResult.data || []
+          orderCount.value = Array.isArray(orderData) ? orderData.length : 0
+        }
 
     // 3. 获取评价数量
     const reviewResponse = await axios.get('/review/user/list')

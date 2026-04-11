@@ -102,16 +102,18 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
 import { useOrderStore } from '../../store/order'
+import { usePaymentStore } from '../../store/payment' // ✅ 1. 引入支付 Store
+
 
 const route = useRoute()
 const router = useRouter()
 const orderStore = useOrderStore()
+const paymentStore = usePaymentStore() // ✅ 2. 实例化
 const order = ref({
   id: '',
   orderNo: '',
@@ -144,27 +146,43 @@ const cancelOrder = async () => {
   }
 }
 
-// 支付订单
-const payOrder = () => {
-  // 跳转到支付页面
-  console.log('去支付')
+
+// ✅ 3. 实现模拟支付逻辑
+const payOrder = async () => {
+  if (!confirm(`确认模拟支付订单 ${order.value.orderNo} 吗？`)) return
+
+  try {
+    // 调用 Store 里的模拟支付方法
+    await paymentStore.mockPaySuccess(order.value.id)
+
+    alert('支付成功！订单已转为【待接单】状态')
+
+    // 支付成功后，重新获取最新的订单详情
+    await fetchOrderDetail()
+  } catch (error) {
+    console.error('模拟支付失败', error)
+    alert('支付失败：' + (error.message || '请重试'))
+  }
 }
 
-// 评价订单
-const reviewOrder = () => {
-  // 跳转到评价页面
-  router.push(`/review/create/${order.value.id}`)
-}
-
-onMounted(async () => {
+// ✅ 4. 抽取刷新详情的方法
+const fetchOrderDetail = async () => {
   const id = route.params.id
   try {
-    // 从后端获取订单详情
     const orderDetail = await orderStore.getOrderDetail(id)
     order.value = orderDetail
   } catch (error) {
     console.error('获取订单详情失败', error)
   }
+}
+
+// 评价订单
+const reviewOrder = () => {
+  router.push(`/review/create/${order.value.id}`)
+}
+
+onMounted(() => {
+  fetchOrderDetail()
 })
 </script>
 

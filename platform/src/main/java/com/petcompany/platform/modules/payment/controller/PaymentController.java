@@ -78,4 +78,26 @@ public class PaymentController {
         return Result.success("回调处理成功");
     }
 
+    /**
+     * ✅ 新增：模拟支付成功接口 (仅供开发测试使用)
+     * GET /payment/mock/{orderId}
+     */
+    @GetMapping("/mock/{orderId}")
+    public Result<?> mockPaymentSuccess(@PathVariable Long orderId) {
+        log.info("开始模拟支付订单: {}", orderId);
+
+        // 1. 获取该订单的支付记录
+        var payment = paymentService.getPaymentByOrderId(orderId);
+        if (payment == null) {
+            // 如果还没创建支付记录，先创建一个
+            Long userId = UserContext.getCurrentUserId();
+            payment = paymentService.createPayment(userId, orderId, 1);
+        }
+
+        // 2. 直接调用回调逻辑，假装微信通知我们要到账了
+        paymentService.handlePaymentCallback(payment.getPayOrderNo(), "MOCK_TRADE_" + System.currentTimeMillis(), 1);
+
+        return Result.success("模拟支付成功！订单状态已更新为【待接单】");
+    }
+
 }

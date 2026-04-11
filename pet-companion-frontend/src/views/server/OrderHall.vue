@@ -1,44 +1,54 @@
 <template>
   <div class="order-hall">
     <Header />
-    
+
     <div class="container">
+      <!-- 返回按钮 -->
+      <div class="back-button-container">
+        <button class="back-button" @click="navigateBack">
+          ← 返回仪表盘
+        </button>
+      </div>
+      
       <h2 class="page-title">订单大厅</h2>
       <p class="page-subtitle">查看并接取新订单</p>
-      
-      <div class="order-card" v-for="order in orders" :key="order.id">
+
+      <!-- ✅ 增加加载状态提示 -->
+      <div v-if="isLoading" class="loading-tip">正在为您寻找新订单...</div>
+
+      <div class="order-card" v-for="order in pendingOrders" :key="order.id">
         <div class="order-header">
           <div class="order-no">订单号：{{ order.orderNo }}</div>
-          <div class="order-time">创建时间：{{ order.createTime }}</div>
+          <div class="order-status status-PENDING">{{ order.statusText }}</div>
         </div>
-        
+
         <div class="order-content">
           <div class="service-info">
-            <h3>{{ order.serviceName }}</h3>
-            <p class="service-time">{{ order.serviceTime }}</p>
-            <p class="service-address">{{ order.address }}</p>
-            <p class="contact-info">联系人：{{ order.contactName }} {{ order.contactPhone }}</p>
+            <h3>{{ order.serviceName }} - {{ order.petName }}</h3>
+            <p class="service-time">⏰ 服务时间：{{ order.serviceTime }}</p>
+            <p class="service-address">📍 服务地址：{{ order.address }}</p>
+            <p class="contact-info">📞 联系电话：{{ order.phone }}</p>
+            <p v-if="order.notes" class="notes">📝 备注：{{ order.notes }}</p>
           </div>
-          <div class="order-price">¥{{ order.price }}</div>
+          <div class="order-price">¥{{ Number(order.price).toFixed(2) }}</div>
         </div>
-        
+
         <div class="order-actions">
           <router-link :to="`/provider/orders/${order.id}`" class="btn-outline">查看详情</router-link>
-          <button class="btn-primary" @click="acceptOrder(order.id)">接取订单</button>
+          <button class="btn-primary" @click="handleAcceptOrder(order.id)">接取订单</button>
         </div>
       </div>
-      
-      <div v-if="orders.length === 0" class="empty-order">
-        <p>暂无新订单</p>
+
+      <div v-if="!isLoading && pendingOrders.length === 0" class="empty-order">
+        <p>暂无新订单，请稍后再来刷新看看～</p>
       </div>
     </div>
-    
+
     <Footer />
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
@@ -46,65 +56,55 @@ import { useOrderStore } from '../../store/order'
 
 const router = useRouter()
 const orderStore = useOrderStore()
-const orders = ref([])
+const isLoading = ref(false)
 
-// 接取订单
-const acceptOrder = (id) => {
-  // 这里应该调用后端API接取订单
-  // 暂时使用模拟数据
-  console.log('接取订单:', id)
-  alert('订单接取成功！')
-  // 接取成功后刷新订单列表
-  fetchOrders()
+// 返回仪表盘
+const navigateBack = () => {
+  router.push('/server/dashboard')
 }
 
-// 获取订单列表
-const fetchOrders = async () => {
+// ✅ 使用计算属性从 Store 获取待接单订单
+const pendingOrders = computed(() => orderStore.pendingOrders || [])
+
+// 接取订单
+const handleAcceptOrder = async (id) => {
+  if (!confirm('确定要接取这个订单吗？')) return
+
   try {
-    // 这里应该从后端获取所有用户预约的服务订单
-    // 暂时使用模拟数据
-    orders.value = [
-      {
-        id: 1,
-        orderNo: '20260410001',
-        serviceName: '宠物陪伴',
-        serviceTime: '2026-04-11 14:00-16:00',
-        address: '北京市朝阳区宠物大厦101室',
-        contactName: '王先生',
-        contactPhone: '138****1234',
-        price: 100,
-        createTime: '2026-04-10 10:00:00'
-      },
-      {
-        id: 2,
-        orderNo: '20260410002',
-        serviceName: '宠物遛弯',
-        serviceTime: '2026-04-12 09:00-10:00',
-        address: '北京市海淀区宠物小区202室',
-        contactName: '李女士',
-        contactPhone: '139****5678',
-        price: 40,
-        createTime: '2026-04-10 09:30:00'
-      },
-      {
-        id: 3,
-        orderNo: '20260410003',
-        serviceName: '宠物喂食',
-        serviceTime: '2026-04-11 18:00-19:00',
-        address: '北京市西城区宠物胡同303号',
-        contactName: '赵先生',
-        contactPhone: '137****9012',
-        price: 30,
-        createTime: '2026-04-10 08:00:00'
-      }
-    ]
+    isLoading.value = true
+    // ✅ 1. 调用后端接口，后端会将状态改为 3 (ACCEPTED)
+    const result = await orderStore.acceptOrder(id)
+
+    alert(`接单成功！当前订单状态已变更为：${result.statusText}`)
+
+    // ✅ 2. 关键：重新从后端拉取最新的“待接单”列表
+    // 这样刚才接的那个单（状态已是 ACCEPTED）就会自动从大厅消失
+    await fetchPendingOrders()
+
+    // ✅ 3. 可选：跳转到我的订单页查看刚接的单
+    // router.push('/provider/orders')
   } catch (error) {
-    console.error('获取订单列表失败', error)
+    console.error('接单失败', error)
+    alert('接单失败：' + (error.message || '请重试'))
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 获取待接单订单列表
+const fetchPendingOrders = async () => {
+  isLoading.value = true
+  try {
+    await orderStore.getPendingOrderList()
+  } catch (error) {
+    console.error('获取订单大厅数据失败', error)
+  } finally {
+    isLoading.value = false
   }
 }
 
 onMounted(() => {
-  fetchOrders()
+  fetchPendingOrders()
 })
 </script>
 
@@ -115,9 +115,34 @@ onMounted(() => {
   flex-direction: column;
 }
 
+.back-button-container {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-color);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.back-button:hover {
+  border-color: var(--cta-color);
+  color: var(--cta-color);
+  transform: translateX(-2px);
+}
+
 .page-title {
   font-size: 2rem;
-  margin-top: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
   color: var(--primary-color);
   text-align: center;

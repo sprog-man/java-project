@@ -12,7 +12,6 @@
             <p>欢迎回来，{{ user?.nickname || user?.username }}</p>
           </div>
           <div class="header-actions">
-            <button class="btn-primary" @click="navigateToOrders">查看全部订单</button>
             <button class="btn-outline" @click="navigateToServices">管理服务</button>
           </div>
         </div>
@@ -68,44 +67,20 @@
       </div>
     </section>
     
-    <!-- 服务管理 -->
-    <section class="services-section">
-      <div class="container">
-        <h2 class="section-title">我的服务</h2>
-        <div class="service-grid">
-          <div class="service-card" v-for="service in services" :key="service.id">
-            <div class="service-icon">{{ service.icon }}</div>
-            <h3>{{ service.name }}</h3>
-            <p>{{ service.description }}</p>
-            <div class="service-price">¥{{ service.price.toFixed(2) }}</div>
-            <div class="service-actions">
-              <button class="btn-sm btn-outline" @click="editService(service.id)">编辑</button>
-              <button class="btn-sm btn-danger" @click="deleteService(service.id)">删除</button>
-            </div>
-          </div>
-          <div class="service-card add-service-card">
-            <div class="add-service-icon">+</div>
-            <h3>添加服务</h3>
-            <p>创建新的服务类型</p>
-            <button class="btn-sm btn-primary" @click="addService">添加</button>
-          </div>
-        </div>
-      </div>
-    </section>
+
     
     <!-- 底部信息 -->
     <Footer />
   </div>
 </template>
 
-<script setup>import { ref, onMounted, computed } from 'vue'
+<script setup>import { ref, onMounted, computed, onActivated } from 'vue' // ✅ 引入 onActivated
 import { useRouter } from 'vue-router'
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
 import { useUserStore } from '../../store/user'
 import { useProviderStore } from '../../store/provider'
-import { useServerStore } from '../../store/server' // ✅ 引入新的 store
-
+import { useServerStore } from '../../store/server'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -125,34 +100,11 @@ const stats = computed(() => ({
 
 
 
-// 服务列表
-const services = ref([
-  {
-    id: 1,
-    name: '宠物陪伴',
-    description: '专业的宠物陪伴服务，让您的爱宠不再孤单',
-    price: 50.00,
-    icon: '🏠'
-  },
-  {
-    id: 2,
-    name: '宠物遛弯',
-    description: '专业的宠物遛弯服务，让您的爱宠保持健康活力',
-    price: 30.00,
-    icon: '🐶'
-  },
-  {
-    id: 3,
-    name: '宠物喂食',
-    description: '定时定量为您的爱宠提供营养均衡的饮食',
-    price: 20.00,
-    icon: '🍖'
-  }
-])
 
-// 导航到订单页面（默认显示已完成订单）
+
+// 导航到已完成订单页面
 const navigateToOrders = () => {
-  router.push('/provider/orders')
+  router.push('/server/completed-orders')
 }
 
 // 导航到订单管理页面
@@ -190,9 +142,19 @@ const addService = () => {
   console.log('添加服务')
 }
 
+// ✅ 抽取刷新方法
+const refreshStats = async () => {
+  await serverStore.fetchAllStats()
+}
+
 // 页面加载时的处理
 onMounted(async () => {
   // 检查用户是否已登录
+  if (!userStore.getIsLoggedIn) {
+    router.push('/login')
+    return
+  }
+
   if (!userStore.getIsLoggedIn) {
     router.push('/login')
     return
@@ -210,14 +172,18 @@ onMounted(async () => {
       return
     }
 
-    // ✅ 获取统计数据
-    await serverStore.fetchAllStats()
+    // ✅ 首次加载获取数据
+    await refreshStats()
 
   } catch (error) {
     console.error('获取用户信息失败', error)
     alert('获取用户信息失败，请重新登录')
     router.push('/login')
   }
+})
+// ✅ 关键：当页面从缓存中激活时（比如从订单页返回），重新获取最新数据
+onActivated(() => {
+  refreshStats()
 })
 </script>
 

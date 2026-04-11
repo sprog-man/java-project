@@ -36,14 +36,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // 构建权限列表
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if (user.getRole() == 1) {
+        if (user.getRole() != null && user.getRole() == 1) {
             authorities.add(new SimpleGrantedAuthority("ADMIN"));
         }
 
-        // 构建UserDetails
-        return new org.springframework.security.core.userdetails.User(
-                user.getId().toString(),
+        // ✅ 修复：返回自定义的 CustomUserDetails，并传入 userType
+        return new CustomUserDetails(
+                user.getId(),
+                user.getPhone(), // 或者 user.getUsername()
                 user.getPassword(),
+                user.getUserType(), // <--- 关键：把数据库里的 2 传进去
                 authorities
         );
     }

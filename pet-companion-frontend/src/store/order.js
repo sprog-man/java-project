@@ -107,19 +107,26 @@ export const useOrderStore = defineStore('order', {
         throw error
       }
     },
-    
+
     // 接受订单
     async acceptOrder(id) {
       try {
         const response = await api.put(`/order/${id}/accept`)
+        // ✅ 确保返回的是后端最新的完整订单对象
+        const updatedOrder = response.data.data;
+
+        // 从待接单列表中移除（因为状态变了，它不再属于“待接单”了）
         const index = this.pendingOrders.findIndex(order => order.id === id)
         if (index !== -1) {
           this.pendingOrders.splice(index, 1)
         }
+
+        // 如果当前详情页正好是这个订单，也更新一下
         if (this.currentOrder && this.currentOrder.id === id) {
-          this.currentOrder = response.data.data
+          this.currentOrder = updatedOrder
         }
-        return response.data.data
+
+        return updatedOrder;
       } catch (error) {
         throw error
       }
