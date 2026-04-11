@@ -108,62 +108,82 @@ com.petcompany.platform/
 - infrastructure ：负责基础设施，包括安全配置和拦截器
 - modules ：负责业务功能，按业务领域划分为多个模块
 
-## 四、项目接口
-
-### 1. 用户接口
-
-- POST /api/user/register ：用户注册
-- POST /api/user/login ：用户登录
-- GET /api/user/info ：获取用户信息
-- PUT /api/user/info ：更新用户信息
-
-### 2. 宠物接口
-
-- POST /api/pet ：添加宠物
-- GET /api/pet ：获取宠物列表
-- GET /api/pet/{id} ：获取宠物详情
-- PUT /api/pet/{id} ：更新宠物信息
-- DELETE /api/pet/{id} ：删除宠物
-
-### 3. 服务接口
-
-- GET /api/service/type ：获取服务类型列表
-- GET /api/service/type/{id} ：获取服务类型详情
-- POST /api/service/provider/apply ：申请成为服务提供者
-- GET /api/service/provider/info ：获取服务提供者信息
-- PUT /api/service/provider/info ：更新服务提供者信息
-
-### 4. 订单接口
-
-- POST /api/order ：创建订单
-- GET /api/order ：获取订单列表
-- GET /api/order/{id} ：获取订单详情
-- PUT /api/order/{id}/cancel ：取消订单
-- PUT /api/order/{id}/accept ：接受订单
-- PUT /api/order/{id}/start ：开始服务
-- PUT /api/order/{id}/complete ：完成服务
-- GET /api/order/provider ：获取服务提供者订单列表
-- GET /api/order/pending ：获取待接单订单列表
-
-### 5. 支付接口
-
-- POST /api/payment/create ：创建支付
-- GET /api/payment/{id} ：获取支付记录
-- GET /api/payment/order/{orderId} ：根据订单ID获取支付记录
-- GET /api/payment/list ：获取用户支付记录列表
-- POST /api/payment/callback ：支付回调
-
-### 6. 评价接口
-
-- POST /api/review/create ：创建评价
-- GET /api/review/{id} ：获取评价详情
-- GET /api/review/order/{orderId} ：根据订单ID获取评价
-- POST /api/review/reply/{id} ：回复评价
-- GET /api/review/user/list ：获取用户评价列表
-- GET /api/review/provider/list ：获取服务提供者评价列表
-
-### 7. 系统接口
-
+# 项目接口清单
+## 一、用户模块
+### 1. UserController
+- POST /user/register ：用户注册
+- POST /user/login ：用户登录
+- POST /user/admin/login ：管理员登录
+- POST /user/{id}/avatar ：上传头像
+- PUT /user/center/modify ：更新用户信息
+- GET /user/info ：获取用户信息
+- PUT /user/center/password ：修改密码
+### 2. AdminController
+- GET /admin/users ：管理员获取用户列表（支持分页和筛选）
+- GET /admin/stats ：管理员获取后台统计数据
+- PUT /admin/users/{id}/status ：管理员更新用户状态
+- DELETE /admin/users/{id} ：管理员删除用户（逻辑删除）
+## 二、宠物模块
+### 1. PetController
+- POST /pet/add ：创建宠物
+- PUT /pet/update ：更新宠物
+- DELETE /pet/{id} ：删除宠物
+- GET /pet/list ：获取宠物列表
+### 2. AdminPetController
+- GET /admin/pets ：管理员获取宠物列表（支持分页和筛选）
+## 三、服务模块
+### 1. ServiceTypeController
+- GET /service-type/list ：获取所有服务类型
+- GET /service-type/{id} ：根据ID获取服务类型
+### 2. ServiceProviderController
+- POST /service-provider/apply ：申请成为服务提供者
+- GET /service-provider/info ：获取服务提供者信息
+- GET /service-provider/pending-orders ：获取待接单的订单列表
+- POST /service-provider/accept-order/{orderId} ：接受订单
+- POST /service-provider/start-service/{orderId} ：开始服务
+- POST /service-provider/complete-service/{orderId} ：完成服务
+- GET /service-provider/orders ：获取服务提供者的订单列表
+- GET /service-provider/stats/completed-orders ：统计已完成订单数
+### 3. AdminServiceController
+- GET /admin/services/provider/pending ：管理员获取待审核的服务者申请列表
+- POST /admin/services/provider/audit/{providerId} ：管理员审核服务提供者申请
+- GET /admin/services ：管理员获取所有服务类型列表
+- POST /admin/services ：管理员添加服务类型
+- PUT /admin/services/{id} ：管理员更新服务类型
+- DELETE /admin/services/{id} ：管理员删除服务类型（逻辑删除）
+## 四、订单模块
+### 1. OrderController
+- GET /order ：获取当前用户的订单列表
+- GET /order/{id} ：获取订单详情
+- POST /order ：创建订单
+- PUT /order/{id}/cancel ：取消订单
+- PUT /order/{id}/accept ：接受订单 (服务者端)
+- PUT /order/{id}/start ：开始服务
+- PUT /order/{id}/complete ：完成服务
+- GET /order/provider ：获取服务提供者订单列表
+- GET /order/pending ：获取待接单订单列表
+- GET /order/provider/stats ：获取服务者订单统计数据 (Dashboard 专用)
+### 2. AdminOrderController
+- GET /admin/orders ：管理员获取订单列表（支持分页和筛选）
+- GET /admin/orders/{id} ：管理员获取订单详情
+- GET /admin/orders/status-options ：获取订单状态枚举列表（供前端筛选下拉框使用）
+## 五、支付模块
+### PaymentController
+- POST /payment/create ：创建支付
+- GET /payment/{id} ：获取支付记录
+- GET /payment/order/{orderId} ：根据订单ID获取支付记录
+- GET /payment/list ：获取用户支付记录列表
+- POST /payment/callback ：支付回调
+- GET /payment/mock/{orderId} ：模拟支付成功接口 (仅供开发测试使用)
+## 六、评价模块
+### ReviewController
+- POST /review/create ：创建评价
+- POST /review/reply/{id} ：回复评价
+- GET /review/{id} ：获取评价详情
+- GET /review/order/{orderId} ：根据订单ID获取评价
+- GET /review/user/list ：获取用户评价列表
+- GET /review/provider/list ：获取服务提供者评价列表
+## 七、系统模块
 - GET /api/health ：健康检查
 - GET /api/test ：测试接口
 
