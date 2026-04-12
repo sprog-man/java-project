@@ -87,6 +87,12 @@ public class Order {
     private Integer payStatus;
 
     /**
+     * ✅ 新增：评价状态：0-未评价，1-已评价
+     */
+    private Integer reviewStatus;
+
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

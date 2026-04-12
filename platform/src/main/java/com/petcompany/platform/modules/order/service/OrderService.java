@@ -1,5 +1,6 @@
 package com.petcompany.platform.modules.order.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.modules.order.dto.OrderCreateRequest;
 import com.petcompany.platform.modules.order.dto.OrderResponse;
@@ -65,6 +66,8 @@ public interface OrderService {
 
 
 
+
+
     /**
      * 统计指定服务提供者在特定状态下的订单数量
      */
@@ -92,5 +95,15 @@ public interface OrderService {
     * 获取服务中订单统计数据
     * */
     Map<String, Object> getProviderStats();
+
+    /**
+     * ✅ 新增：更新订单信息（用于评价联动等场景）
+     */
+    void updateOrder(Order order);
+
+    /**
+     * ✅ 新增：根据条件查询订单列表（供其他 Service 跨表搜索使用）
+     */
+    List<Order> list(LambdaQueryWrapper<Order> wrapper);
 }
 

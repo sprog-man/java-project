@@ -244,6 +244,35 @@ export const useAdminStore = defineStore('admin', {
                 console.error('Admin Store: 审核异常', error)
                 throw error
             }
+        },
+        // ✅ 新增：获取评价列表（管理员用）
+        async fetchReviewList(params = {}) {
+            try {
+                console.log('Admin Store: 开始获取评价列表', params)
+                const response = await axios.get('/admin/reviews', { params })
+
+                if (response.data && response.data.code === 200) {
+                    return response.data.data // 返回分页对象 { records: [], total: 100, ... }
+                } else {
+                    throw new Error(response.data?.message || '获取评价列表失败')
+                }
+            } catch (error) {
+                console.error('Admin Store: 获取评价列表异常', error)
+                throw error
+            }
+        },
+        // ✅ 新增：删除评价
+        async deleteReview(reviewId) {
+            try {
+                const response = await axios.delete(`/admin/reviews/${reviewId}`)
+                if (response.data && response.data.code === 200) {
+                    return true
+                }
+                throw new Error(response.data?.message || '删除失败')
+            } catch (error) {
+                console.error('Admin Store: 删除评价异常', error)
+                throw error
+            }
         }
     }
 })

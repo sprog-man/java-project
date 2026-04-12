@@ -4,8 +4,9 @@
     
     <div class="container">
       <h2 class="page-title">评价服务</h2>
-      
-      <form class="create-review-form" @submit.prevent="handleSubmit">
+
+      <!-- ✅ 修复：增加 v-if 保护，确保 orderId 存在再渲染表单 -->
+      <form v-if="orderId" class="create-review-form" @submit.prevent="handleSubmit">
         <div class="form-section">
           <h3>服务信息</h3>
           <div class="service-info">
@@ -58,13 +59,14 @@
             </div>
           </div>
         </div>
-        
+
         <div class="form-actions">
           <button type="submit" class="btn-primary" :disabled="isLoading">
             <span v-if="isLoading" class="loading"></span>
             <span v-else>提交评价</span>
           </button>
-          <router-link :to="`/user/orders/${orderId}`" class="btn-outline">取消</router-link>
+          <!-- ✅ 修复：使用 computed 后的 orderId -->
+          <router-link :to="`/user/orders`" class="btn-outline">取消</router-link>
         </div>
       </form>
     </div>
@@ -86,7 +88,8 @@ const router = useRouter()
 const reviewStore = useReviewStore()
 const orderStore = useOrderStore()
 
-const orderId = route.params.id
+// ✅ 修复：使用 ref 存储 ID，初始为 null
+const orderId = ref(null)
 
 // 订单信息
 const orderInfo = ref({
@@ -131,27 +134,60 @@ const removeImage = (index) => {
 const handleSubmit = async () => {
   isLoading.value = true
   try {
-    await reviewStore.createReview(orderId, reviewForm.value)
-    // 提交成功后跳转到订单详情
-    router.push(`/user/orders/${orderId}`)
+    // ✅ 修复：准备提交的数据
+    const submitData = {
+      rating: reviewForm.value.rating,
+      content: reviewForm.value.content,
+      // 如果没有图片，就传 null 或空字符串，不要传空数组
+      images: reviewForm.value.images.length > 0 ? reviewForm.value.images.join(',') : ''
+    }
+
+    await reviewStore.createReview(orderId.value, submitData)
+
+    alert('评价提交成功！')
+    // ✅ 核心修复：提交成功后，主动刷新订单列表
+    await orderStore.getOrderList()
+
+    router.push('/user/orders')
   } catch (error) {
     console.error('提交评价失败', error)
+    alert('提交失败：' + (error.message || '未知错误'))
   } finally {
     isLoading.value = false
   }
 }
 
 onMounted(async () => {
+  // ✅ 修复：从 route.params.orderId 获取（对应路由定义里的 :orderId）
+  const id = route.params.orderId;
+  console.log('CreateReview.vue - 原始路由参数:', route.params);
+
+  if (!id) {
+    alert('无法获取订单ID，请从订单列表页点击“去评价”进入')
+    router.back()
+    return
+  }
+
+  orderId.value = id;
+  console.log('CreateReview.vue - 成功获取订单 ID:', orderId.value);
+
   try {
-    // 这里应该从后端获取订单信息
-    // 暂时使用模拟数据
-    orderInfo.value = {
-      serviceName: '宠物陪伴',
-      serviceTime: '2026-04-01 14:00-16:00',
-      providerName: '张阿姨'
+    // 获取订单详情
+    const order = await orderStore.getOrderDetail(orderId.value)
+    if (order) {
+      orderInfo.value = {
+        serviceName: order.serviceName,
+        serviceTime: order.serviceTime,
+        providerName: order.providerName
+      }
+    } else {
+      alert('无法获取订单信息')
+      router.back()
     }
   } catch (error) {
     console.error('获取订单信息失败', error)
+    alert('加载订单信息出错')
+    router.back()
   }
 })
 </script>

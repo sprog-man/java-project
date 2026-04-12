@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS `pet_order` (
     `price` DOUBLE NOT NULL COMMENT '订单价格',
     `status` TINYINT DEFAULT 1 COMMENT '订单状态：1-待支付，2-待接单，3-已接单，4-服务中，5-已完成，6-已取消',
     `pay_status` TINYINT DEFAULT 0 COMMENT '支付状态：0-未支付，1-已支付，2-退款中，3-已退款',
+    `review_status` TINYINT DEFAULT 0 COMMENT '评价状态：0-未评价，1-已评价',
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',

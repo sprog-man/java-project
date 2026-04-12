@@ -1,5 +1,6 @@
 package com.petcompany.platform.modules.review.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.petcompany.platform.modules.review.dto.ReviewResponse;
 import com.petcompany.platform.modules.review.entity.Review;
 
@@ -41,7 +42,13 @@ public interface ReviewService {
     List<ReviewResponse> getProviderReviewList(Long providerId);
 
     /*
-    * 暴露接口给其他模块调用，统计评价数据
+    * 获取管理员评价列表
     * */
-    long countAllReview();
+    Page<ReviewResponse> getAdminReviewPage(int page, int size, String keyword, Integer rating);
+
+
+    /*
+    * 删除评价
+    * */
+    void deleteReview(Long id);
 }

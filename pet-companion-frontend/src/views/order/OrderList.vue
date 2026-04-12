@@ -51,13 +51,22 @@
             取消订单
           </button>
 
-          <!-- ✅ 已完成且未评价：显示去评价 -->
+          <!-- ✅ 核心联动：已完成且未评价 -> 显示“去评价” -->
           <button
               v-if="order.status === 'COMPLETED' && !order.reviewed"
               class="btn-primary"
-              @click="reviewOrder(order.id)"
+              @click="reviewOrder(order)"
           >
             去评价
+          </button>
+
+          <!-- ✅ 核心联动：已完成且已评价 -> 显示“已评价” (禁用状态) -->
+          <button
+              v-else-if="order.status === 'COMPLETED' && order.reviewed"
+              class="btn-outline"
+              disabled              style="cursor: not-allowed; opacity: 0.6;"
+          >
+            已评价
           </button>
         </div>
       </div>
@@ -123,14 +132,40 @@ const payOrder = (id) => {
 }
 
 // 评价订单
-const reviewOrder = (id) => {
+const reviewOrder = (target) => { // ✅ 修改参数名为 target，因为它可能是对象也可能是 ID
+  let orderId = null;
+
+  // ✅ 核心修复：判断传入的是对象还是直接的 ID
+  if (typeof target === 'object' && target !== null) {
+    orderId = target.id;
+    console.log('传入的是订单对象:', target);
+  } else {
+    orderId = target;
+    console.log('传入的是直接 ID:', target);
+  }
+
+  if (!orderId) {
+    alert('订单信息异常：缺少订单ID')
+    return
+  }
+
   // 跳转到评价页面
-  router.push(`/review/create/${id}`)
+  router.push(`/review/create/${orderId}`)
+}
+
+// ✅ 核心修复：定义一个刷新数据的函数
+const refreshOrders = async () => {
+  try {
+    await orderStore.getOrderList()
+    orders.value = orderStore.orders || []
+  } catch (error) {
+    console.error('获取订单列表失败', error)
+  }
 }
 
 onMounted(async () => {
+  // ✅ 每次进入页面都重新拉取最新数据
   try {
-    // ✅ 调用 Store 获取真实数据
     await orderStore.getOrderList()
     orders.value = orderStore.orders || []
     console.log('当前用户的真实订单:', orders.value)
@@ -138,6 +173,8 @@ onMounted(async () => {
     console.error('获取订单列表失败', error)
   }
 })
+
+
 </script>
 
 <style scoped>

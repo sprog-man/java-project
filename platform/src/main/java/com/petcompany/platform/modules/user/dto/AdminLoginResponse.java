@@ -56,6 +56,9 @@ public class AdminLoginResponse {
          */
         private String avatar;
 
+        // ✅ 新增：增加 role 字段，方便前端路由守卫识别
+        private Integer role;
+
         public Long getId() {
             return id;
         }
@@ -87,5 +90,8 @@ public class AdminLoginResponse {
         public void setAvatar(String avatar) {
             this.avatar = avatar;
         }
+        // ✅ 新增 getter/setter
+        public Integer getRole() { return role; }
+        public void setRole(Integer role) { this.role = role; }
     }
 }

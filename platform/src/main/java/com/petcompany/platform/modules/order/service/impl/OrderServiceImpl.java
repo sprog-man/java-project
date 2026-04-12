@@ -355,7 +355,10 @@ public class OrderServiceImpl implements OrderService {
             response.setPrice(java.math.BigDecimal.valueOf(order.getPrice()));
         }
         response.setCreateTime(order.getCreateTime());
-        response.setReviewed(false);
+        // ✅ 核心修复：根据数据库字段动态设置评价状态
+        // 如果 reviewStatus 为 1，则设为 true，否则为 false
+        response.setReviewed(order.getReviewStatus() != null && order.getReviewStatus() == 1);
+
 
 
         // ✅ 2. 获取并设置用户名（下单用户）
@@ -576,6 +579,19 @@ public class OrderServiceImpl implements OrderService {
         stats.put("averageRating", 4.8);
 
         return stats;
+    }
+
+    @Override
+    public void updateOrder(Order order) {
+        order.setUpdateTime(LocalDateTime.now());
+        orderMapper.updateById(order);
+        log.info("更新订单 {} 成功", order.getId());
+    }
+
+    // ✅ 新增：实现 list 方法，底层调用 Mapper 的 selectList
+    @Override
+    public List<Order> list(LambdaQueryWrapper<Order> wrapper) {
+        return orderMapper.selectList(wrapper);
     }
 
 }

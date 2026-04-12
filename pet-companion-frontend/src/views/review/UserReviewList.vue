@@ -4,28 +4,40 @@
     
     <div class="container">
       <h2 class="page-title">我的评价</h2>
-      
+
+      <!-- ✅ 循环渲染真实数据 -->
       <div class="review-card" v-for="review in reviews" :key="review.id">
         <div class="review-header">
           <div class="service-info">
-            <h3>{{ review.serviceName }}</h3>
-            <p>{{ review.serviceTime }}</p>
+            <!-- ✅ 显示动态获取的服务名称 -->
+            <h3>{{ review.serviceName || '宠物陪伴服务' }}</h3>
+            <!-- ✅ 显示订单号 -->
+            <p>订单号：{{ review.orderNo }}</p>
+            <!-- ✅ 显示服务时间 -->
+            <p>服务时间：{{ review.serviceTime }}</p>
           </div>
           <div class="review-rating">
-            <span class="star" v-for="i in 5" :key="i" :class="{ active: i <= review.rating }">&#9733;</span>
+            <!-- ✅ 评分渲染：注意后端返回的是 score -->
+            <span class="star" v-for="i in 5" :key="i" :class="{ active: i <= review.score }">&#9733;</span>
           </div>
         </div>
-        
+
         <div class="review-content">
           <p>{{ review.content }}</p>
+          <!-- ✅ 图片渲染：处理逗号分隔的字符串 -->
           <div class="review-images" v-if="review.images && review.images.length > 0">
-            <img v-for="(image, index) in review.images" :key="index" :src="image" :alt="'评价图片' + (index + 1)" />
+            <img
+                v-for="(image, index) in review.images.split(',')"
+                :key="index"
+                :src="image.trim()"
+                :alt="'评价图片' + (index + 1)"
+            />
           </div>
         </div>
-        
+
         <div class="review-footer">
-          <div class="review-time">{{ review.createTime }}</div>
-          <div class="order-no">订单号：{{ review.orderNo }}</div>
+          <!-- ✅ 显示评价创建时间 -->
+          <div class="review-time">评价于：{{ review.createTime }}</div>
         </div>
       </div>
       
@@ -39,45 +51,28 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, computed, onMounted } from 'vue' // ✅ 修复：增加 computed 的导入
 import Header from '../../components/layout/Header.vue'
 import Footer from '../../components/layout/Footer.vue'
 import { useReviewStore } from '../../store/review'
 
 const reviewStore = useReviewStore()
-const reviews = ref([])
+
+// ✅ 使用 computed 从 Store 获取数据，并处理图片格式
+const reviews = computed(() => {
+  return reviewStore.reviews.map(review => ({
+    ...review,
+    // 后端 images 是逗号分隔的字符串，前端需要转成数组
+    images: review.images ? review.images.split(',') : []
+  }))
+})
 
 onMounted(async () => {
   try {
-    // 这里应该从后端获取用户评价列表
-    // 暂时使用模拟数据
-    reviews.value = [
-      {
-        id: 1,
-        serviceName: '宠物陪伴',
-        serviceTime: '2026-04-01 14:00-16:00',
-        rating: 5,
-        content: '服务非常好，阿姨很专业，对我家狗狗很有耐心，下次还会预约！',
-        images: [
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=happy%20dog%2C%20cute&image_size=square'
-        ],
-        createTime: '2026-04-01 16:30:00',
-        orderNo: '20260401001'
-      },
-      {
-        id: 2,
-        serviceName: '宠物遛弯',
-        serviceTime: '2026-03-28 09:00-10:00',
-        rating: 4,
-        content: '服务不错，准时到达，狗狗很开心。',
-        images: [],
-        createTime: '2026-03-28 10:30:00',
-        orderNo: '20260328001'
-      }
-    ]
+    // ✅ 调用 Store 方法获取真实数据
+    await reviewStore.getUserReviews()
   } catch (error) {
-    console.error('获取评价列表失败', error)
+    console.error('加载评价列表出错', error)
   }
 })
 </script>

@@ -54,11 +54,11 @@ public class UserController {
     /**
      * 管理员登录
      */
-    @PostMapping("/admin/login")
+    @PostMapping("/admin/login") // 确保路径匹配前端的 /user/admin/login 或 /admin/login
     public Result<AdminLoginResponse> adminLogin(@Valid @RequestBody AdminLoginRequest request) {
-        log.info("接收到管理员登录请求: username={}", request.getUsername());
+        log.info("管理员尝试登录: {}", request.getUsername());
         AdminLoginResponse response = userService.adminLogin(request);
-        return Result.success("登录成功", response);
+        return Result.success(response);
     }
 
     /**

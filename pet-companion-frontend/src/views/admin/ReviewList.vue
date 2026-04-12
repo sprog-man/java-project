@@ -1,148 +1,110 @@
 <template>
   <div class="review-list-container">
-        <!-- 搜索和筛选 -->
-        <div class="search-filter">
-          <div class="search-box">
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              placeholder="搜索订单号或用户名"
-              @input="handleSearch"
-            />
-            <button class="search-btn">搜索</button>
+    <!-- 搜索和筛选 -->
+    <div class="search-filter">
+      <div class="search-box">
+        <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="搜索订单号或用户名"
+            @keyup.enter="handleSearch"
+        />
+        <button class="search-btn" @click="handleSearch">搜索</button>
+      </div>
+      <div class="filter-box">
+        <select v-model="filters.rating" @change="handleFilter">
+          <option value="">全部评分</option>
+          <option value="5">5星</option>
+          <option value="4">4星</option>
+          <option value="3">3星</option>
+          <option value="2">2星</option>
+          <option value="1">1星</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 评价列表 -->
+    <div class="review-list">
+      <table class="review-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>订单号</th>
+          <th>用户</th>
+          <th>服务类型</th>
+          <th>评分</th>
+          <th>评价内容</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="review in reviews" :key="review.id">
+          <td>{{ review.id }}</td>
+          <td>{{ review.orderNo }}</td>
+          <td>{{ review.userName }}</td>
+          <td>{{ review.serviceName }}</td>
+          <td>{{ '⭐'.repeat(review.score) }}</td>
+          <td class="review-content">{{ review.content }}</td>
+          <td>{{ review.createTime }}</td>
+          <td class="action-buttons">
+            <button class="detail-btn" @click="viewReviewDetail(review.id)">详情</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!-- 分页 -->
+      <div class="pagination">
+        <button class="page-btn" :disabled="currentPage === 1" @click="changePage(currentPage - 1)">上一页</button>
+        <span class="page-info">第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
+        <button class="page-btn" :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">下一页</button>
+      </div>
+    </div>
+
+    <!-- 评价详情对话框 (保持不变，只需确保字段名对应即可) -->
+    <div class="modal" v-if="showDetailModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>评价详情</h3>
+          <button class="close-btn" @click="showDetailModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="review-detail">
+            <div class="detail-item"><label>订单号:</label><span>{{ currentReview.orderNo }}</span></div>
+            <div class="detail-item"><label>用户:</label><span>{{ currentReview.userName }}</span></div>
+            <div class="detail-item"><label>服务类型:</label><span>{{ currentReview.serviceName }}</span></div>
+            <div class="detail-item"><label>评分:</label><span>{{ '⭐'.repeat(currentReview.score) }}</span></div>
+            <div class="detail-item"><label>评价内容:</label><span>{{ currentReview.content }}</span></div>
+            <div class="detail-item"><label>创建时间:</label><span>{{ currentReview.createTime }}</span></div>
           </div>
-          <div class="filter-box">
-            <select v-model="filters.rating" @change="handleFilter">
-              <option value="">全部评分</option>
-              <option value="5">5星</option>
-              <option value="4">4星</option>
-              <option value="3">3星</option>
-              <option value="2">2星</option>
-              <option value="1">1星</option>
-            </select>
+          <div class="modal-footer">
+            <button class="close-modal-btn" @click="showDetailModal = false">关闭</button>
           </div>
         </div>
-        
-        <!-- 评价列表 -->
-        <div class="review-list">
-          <table class="review-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>订单号</th>
-                <th>用户</th>
-                <th>服务类型</th>
-                <th>评分</th>
-                <th>评价内容</th>
-                <th>创建时间</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="review in reviews" :key="review.id">
-                <td>{{ review.id }}</td>
-                <td>{{ review.orderNumber }}</td>
-                <td>{{ review.userName }}</td>
-                <td>{{ review.serviceName }}</td>
-                <td>{{ getRatingStars(review.rating) }}</td>
-                <td class="review-content">{{ review.content }}</td>
-                <td>{{ formatDate(review.createTime) }}</td>
-                <td class="action-buttons">
-                  <button class="detail-btn" @click="viewReviewDetail(review.id)">详情</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-          <!-- 分页 -->
-          <div class="pagination">
-            <button 
-              class="page-btn" 
-              :disabled="currentPage === 1" 
-              @click="changePage(currentPage - 1)"
-            >
-              上一页
-            </button>
-            <span class="page-info">
-              第 {{ currentPage }} 页，共 {{ totalPages }} 页
-            </span>
-            <button 
-              class="page-btn" 
-              :disabled="currentPage === totalPages" 
-              @click="changePage(currentPage + 1)"
-            >
-              下一页
-            </button>
-          </div>
-        </div>
-        
-        <!-- 评价详情对话框 -->
-        <div class="modal" v-if="showDetailModal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3>评价详情</h3>
-              <button class="close-btn" @click="showDetailModal = false">&times;</button>
-            </div>
-            <div class="modal-body">
-              <div class="review-detail">
-                <div class="detail-item">
-                  <label>订单号:</label>
-                  <span>{{ currentReview.orderNumber }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>用户:</label>
-                  <span>{{ currentReview.userName }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>服务类型:</label>
-                  <span>{{ currentReview.serviceName }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>评分:</label>
-                  <span>{{ getRatingStars(currentReview.rating) }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>评价内容:</label>
-                  <span>{{ currentReview.content }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>创建时间:</label>
-                  <span>{{ formatDate(currentReview.createTime) }}</span>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button class="close-modal-btn" @click="showDetailModal = false">关闭</button>
-              </div>
-            </div>
-          </div>
-        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted } from 'vue'
+import { useAdminStore } from '../../store/admin' // ✅ 引入 Store
 
+
+const adminStore = useAdminStore()
 const reviews = ref([])
 const searchQuery = ref('')
-const filters = ref({
-  rating: ''
-})
+const filters = ref({ rating: '' })
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalPages = ref(1)
 const showDetailModal = ref(false)
-const currentReview = ref({
-  orderNumber: '',
-  userName: '',
-  serviceName: '',
-  rating: 0,
-  content: '',
-  createTime: ''
-})
+const currentReview = ref({})
 
 const getRatingStars = (rating) => {
   return '⭐'.repeat(rating)
 }
+
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
@@ -150,13 +112,30 @@ const formatDate = (dateString) => {
   return date.toLocaleString('zh-CN')
 }
 
+// ✅ 真实获取数据
+const fetchReviews = async () => {
+  try {
+    const params = {
+      page: currentPage.value,
+      size: pageSize.value,
+      keyword: searchQuery.value,
+      rating: filters.value.rating || null
+    }
+    const pageData = await adminStore.fetchReviewList(params)
+    reviews.value = pageData.records || []
+    totalPages.value = Math.ceil(pageData.total / pageSize.value) || 1
+  } catch (error) {
+    console.error('获取评价列表失败:', error)
+  }
+}
+
 const handleSearch = () => {
-  // 实现搜索逻辑
+  currentPage.value = 1
   fetchReviews()
 }
 
 const handleFilter = () => {
-  // 实现筛选逻辑
+  currentPage.value = 1
   fetchReviews()
 }
 
@@ -166,76 +145,10 @@ const changePage = (page) => {
 }
 
 const viewReviewDetail = (reviewId) => {
-  // 实现查看评价详情逻辑
   const review = reviews.value.find(r => r.id === reviewId)
   if (review) {
-    currentReview.value = {
-      orderNumber: review.orderNumber,
-      userName: review.userName,
-      serviceName: review.serviceName,
-      rating: review.rating,
-      content: review.content,
-      createTime: review.createTime
-    }
+    currentReview.value = review
     showDetailModal.value = true
-  }
-}
-
-const fetchReviews = async () => {
-  try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
-    // 模拟数据
-    reviews.value = [
-      {
-        id: 1,
-        orderNumber: '202604080001',
-        userName: '用户1',
-        serviceName: '宠物洗澡',
-        rating: 5,
-        content: '服务非常好，宠物洗得很干净，工作人员很专业。',
-        createTime: '2026-04-08T10:00:00'
-      },
-      {
-        id: 2,
-        orderNumber: '202604080002',
-        userName: '用户2',
-        serviceName: '宠物寄养',
-        rating: 4,
-        content: '寄养环境很好，宠物很开心，就是价格有点贵。',
-        createTime: '2026-04-08T11:00:00'
-      },
-      {
-        id: 3,
-        orderNumber: '202604080003',
-        userName: '用户3',
-        serviceName: '宠物美容',
-        rating: 5,
-        content: '美容效果很好，宠物看起来很精神，服务态度也很好。',
-        createTime: '2026-04-08T12:00:00'
-      },
-      {
-        id: 4,
-        orderNumber: '202604080004',
-        userName: '用户4',
-        serviceName: '宠物医疗',
-        rating: 3,
-        content: '医疗服务一般，等待时间有点长。',
-        createTime: '2026-04-08T13:00:00'
-      },
-      {
-        id: 5,
-        orderNumber: '202604080005',
-        userName: '用户5',
-        serviceName: '宠物训练',
-        rating: 5,
-        content: '训练效果很好，宠物变得很听话，推荐！',
-        createTime: '2026-04-08T14:00:00'
-      }
-    ]
-    totalPages.value = 1
-  } catch (error) {
-    console.error('获取评价列表失败:', error)
   }
 }
 

@@ -81,4 +81,10 @@ public interface UserService {
      * 管理员逻辑删除用户
      */
     void deleteUserByAdmin(Long userId);
+
+    /**
+     * ✅ 新增：根据条件查询用户列表（供其他 Service 跨表搜索使用）
+     */
+    java.util.List<User> list(com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<User> wrapper);
+
 }

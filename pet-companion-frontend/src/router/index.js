@@ -256,17 +256,24 @@ router.beforeEach((to, from, next) => {
   // 从localStorage获取token
   const token = localStorage.getItem('token')
   // 从localStorage获取用户信息
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'))
-  
+
+  let userInfo = null;
+  try {
+    userInfo = JSON.parse(localStorage.getItem('userInfo'))
+  } catch (e) {
+    console.error("解析用户信息失败", e)
+  }
+
+
   // 如果需要登录但没有token，跳转到登录页面
   if (requiresAuth && !token) {
     next('/login')
-  } 
-  // 如果需要管理员权限但不是管理员，跳转到登录页面
+  }
+  // ✅ 修复：如果 userInfo 为空或者 role 确实不是 1，才拦截
   else if (requiresAdmin && (!userInfo || userInfo.role !== 1)) {
+    console.warn('非管理员尝试访问后台，已拦截')
     next('/login')
-  } 
-  // 其他情况，允许访问
+  }
   else {
     next()
   }

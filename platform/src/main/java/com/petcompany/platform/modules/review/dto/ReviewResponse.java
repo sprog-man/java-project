@@ -65,6 +65,21 @@ public class ReviewResponse {
      */
     private String providerName;
 
+    /**
+     * ✅ 新增：订单号
+     */
+    private String orderNo;
+
+    /**
+     * ✅ 新增：服务名称（从关联的订单中获取）
+     */
+    private String serviceName;
+
+    /**
+     * ✅ 新增：服务时间（从关联的订单中获取）
+     */
+    private String serviceTime;
+
 
 
 }

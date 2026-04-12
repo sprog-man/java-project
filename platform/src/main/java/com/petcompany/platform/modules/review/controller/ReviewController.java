@@ -29,10 +29,22 @@ public class ReviewController {
     @PostMapping("/create")
     public Result<?> createReview(@Valid @RequestBody ReviewCreateRequest request) {
         Long userId = UserContext.getCurrentUserId();
+
+        // ✅ 增加空值校验
+        if (request.getOrderId() == null) {
+            log.warn("用户 {} 提交评价时未提供订单ID", userId);
+            return Result.fail("订单ID不能为空");
+        }
+
         log.info("用户{}创建评价，订单ID：{}", userId, request.getOrderId());
 
-        reviewService.createReview(userId, request.getOrderId(), request.getScore(), request.getContent(), request.getImages());
-        return Result.success("评价创建成功");
+        try {
+            reviewService.createReview(userId, request.getOrderId(), request.getScore(), request.getContent(), request.getImages());
+            return Result.success("评价创建成功");
+        } catch (Exception e) {
+            log.error("评价创建失败", e);
+            return Result.fail(e.getMessage());
+        }
     }
 
     /**
@@ -76,6 +88,10 @@ public class ReviewController {
         log.info("获取用户{}的评价列表", userId);
 
         List<ReviewResponse> list = reviewService.getUserReviewList(userId);
+
+        // ✅ 核心调试：打印返回列表的大小
+        log.info("查询到的评价数量为: {}", list.size());
+
         return Result.success(list);
     }
 

@@ -37,12 +37,14 @@
                 <router-link to="/user/center" class="dropdown-item">个人中心</router-link>
                 <router-link to="/user/pets" class="dropdown-item">我的宠物</router-link>
                 <router-link to="/user/orders" class="dropdown-item">我的订单</router-link>
+                <router-link to="/user/reviews" class="dropdown-item">我的评价</router-link>
                 <template v-if="userType === 'USER'">
                   <router-link to="/provider/apply" class="dropdown-item">申请成为服务提供者</router-link>
                 </template>
                 <template v-if="userType === 'PROVIDER'">
                   <router-link to="/provider/center" class="dropdown-item">服务提供者中心</router-link>
                   <router-link to="/provider/orders" class="dropdown-item">服务订单</router-link>
+                  <router-link to="/provider/reviews" class="dropdown-item">我的评价</router-link>
                 </template>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item logout-button" @click="logout">退出登录</button>

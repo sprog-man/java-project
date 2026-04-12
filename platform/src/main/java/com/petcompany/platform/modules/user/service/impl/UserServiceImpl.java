@@ -178,6 +178,7 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("role", user.getRole());
+        claims.put("userType", user.getUserType() != null ? user.getUserType() : 0); // 默认为 0
         String token = jwtService.generateToken(claims);
 
         // 构建响应
@@ -189,6 +190,8 @@ public class UserServiceImpl implements UserService {
         adminInfo.setUsername(user.getUsername());
         adminInfo.setNickname(user.getNickname());
         adminInfo.setAvatar(user.getAvatar());
+        adminInfo.setRole(user.getRole()); // ✅ 核心修复：把 role 塞进去
+
 
         response.setAdminInfo(adminInfo);
 
@@ -445,5 +448,12 @@ public class UserServiceImpl implements UserService {
 
         log.info("用户已被逻辑删除: userId={}", userId);
     }
+
+    // ✅ 新增：实现 list 方法，底层调用 Mapper 的 selectList
+    @Override
+    public java.util.List<User> list(LambdaQueryWrapper<User> wrapper) {
+        return userMapper.selectList(wrapper);
+    }
+
 
 }

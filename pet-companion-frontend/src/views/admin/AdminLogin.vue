@@ -50,33 +50,27 @@ const handleSubmit = async () => {
   isLoading.value = true
   errorMessage.value = ''
   try {
+    // ✅ 确认路径：如果后端是 @RequestMapping("/admin") + @PostMapping("/login")，这里应该是 /admin/login
     const response = await api.post('/user/admin/login', form.value)
 
-    // 修正：适配后端 Result 类的返回格式 (code: 200)
     if (response.data && response.data.code === 200) {
       const { accessToken, adminInfo } = response.data.data
 
-      console.log('管理员登录成功:', adminInfo)
+      console.log('✅ 登录成功，准备存储 Token:', accessToken)
 
-      // 存储 Token 和管理员信息
+      // ✅ 核心修复：存储时显式带上 role: 1，确保路由守卫能通过
       localStorage.setItem('token', accessToken)
       localStorage.setItem('userInfo', JSON.stringify({
-        id: adminInfo.id,
-        username: adminInfo.username,
-        nickname: adminInfo.nickname,
-        avatar: adminInfo.avatar,
-        role: 1 // 强制设置为管理员角色
+        ...adminInfo,
+        role: 1 // 强制标记为管理员，防止后端漏传或前端解析错误
       }))
-
-      // 跳转到后台中心
+      // ✅ 建议：使用 router.push 而不是 window.location.href，体验更丝滑
       router.push('/admin/center')
     } else {
-      // 业务逻辑失败（如密码错误）
       errorMessage.value = response.data?.message || '登录失败'
     }
   } catch (error) {
-    console.error('登录失败:', error)
-    // 网络错误或服务器异常
+    console.error('❌ 登录请求异常:', error)
     errorMessage.value = error.response?.data?.message || '登录失败，请检查网络连接'
   } finally {
     isLoading.value = false
